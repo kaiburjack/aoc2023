@@ -45,7 +45,7 @@ func (p *parser) ws() {
 
 func (p *parser) card() (int, error) {
 	winningNumbers := make(map[int]bool)
-	points := 0
+	numberOfWinningNumbers := 0
 	err := p.expect("Card")
 	if err == io.EOF {
 		return 0, err
@@ -70,24 +70,39 @@ func (p *parser) card() (int, error) {
 			winningNumbers[n] = true
 		} else {
 			if winningNumbers[n] {
-				points = max(points<<1, 1)
+				numberOfWinningNumbers++
 			}
 		}
 	}
-	return points, nil
+	return numberOfWinningNumbers, nil
 }
 
 func main() {
 	file, _ := os.OpenFile("input.txt", os.O_RDONLY, 0)
 	r := bufio.NewReader(file)
 	p := parser{r}
-	sumOfPoints := 0
+	var wonCopies []int64
+	var numWonCards int64 = 0
 	for {
-		points, err := p.card()
+		numberOfWinningNumbers, err := p.card()
 		if err == io.EOF {
 			break
 		}
-		sumOfPoints += points
+		var count int64 = 1
+		if len(wonCopies) > 0 {
+			count = 1 + wonCopies[0]
+		} else {
+			wonCopies = append(wonCopies, 1)
+		}
+		numWonCards += count
+		wonCopies = wonCopies[1:]
+		for i := 0; i < numberOfWinningNumbers; i++ {
+			if len(wonCopies) > i {
+				wonCopies[i] += count
+			} else {
+				wonCopies = append(wonCopies, count)
+			}
+		}
 	}
-	println(sumOfPoints)
+	println(numWonCards)
 }
