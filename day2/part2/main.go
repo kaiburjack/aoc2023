@@ -118,7 +118,7 @@ func main() {
 	file, _ := os.OpenFile("input.txt", os.O_RDONLY, 0)
 	r := bufio.NewReader(file)
 	p := parser{r}
-	var sumOrPowers int64 = 0
+	var sumOfPowers int64 = 0
 	for {
 		g, err := p.game()
 		if err == io.EOF {
@@ -133,7 +133,7 @@ func main() {
 			}
 		}
 		power := int64(minimums[0]) * int64(minimums[1]) * int64(minimums[2])
-		sumOrPowers += power
+		sumOfPowers += power
 	}
-	println(sumOrPowers)
+	println(sumOfPowers)
 }
