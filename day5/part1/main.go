@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-// Range represents a linear interval mapping between two ranges.
+// Range represents a linear interval mapping between two intervals (of the same length).
 type Range struct {
 	dstStart uint64
 	srcStart uint64

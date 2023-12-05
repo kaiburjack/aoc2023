@@ -7,13 +7,14 @@ import (
 	"os"
 )
 
-// Range represents a linear interval mapping between two ranges.
+// Range represents a linear interval mapping between two intervals (of the same length).
 type Range struct {
 	dstStart uint64
 	srcStart uint64
 	length   uint64
 }
 
+// Interval represents a contiguous interval/sequence of numbers.
 type Interval struct {
 	start  uint64
 	length uint64
@@ -137,10 +138,10 @@ func (p *parser) until(e byte) error {
 
 // Below is the actual "implementation"
 
-func Map(inputIntervals []Interval, rl []Range) []Interval {
+func Map(inputIntervals []Interval, ranges []Range) []Interval {
 	var resultIntervals []Interval               // <- final mapping results
 	var remainingIntervals = make([]Interval, 0) // <- intervals that are not mapped yet
-	for _, r := range rl {
+	for _, r := range ranges {
 		inputIntervals = append(inputIntervals, remainingIntervals...)
 		remainingIntervals = remainingIntervals[:0]
 		for _, interval := range inputIntervals {
@@ -148,30 +149,37 @@ func Map(inputIntervals []Interval, rl []Range) []Interval {
 			// Consider all cases:
 			if interval.start >= r.srcStart && interval.start+interval.length <= r.srcStart+r.length {
 				// interval completely within range
-				resultIntervals = append(resultIntervals, Interval{r.dstStart + interval.start - r.srcStart, interval.length})
+				resultIntervals = append(resultIntervals,
+					Interval{r.dstStart + interval.start - r.srcStart, interval.length})
 			} else if interval.start >= r.srcStart && interval.start <= r.srcStart+r.length {
 				// interval starting in range but ending outside
 				if r.srcStart+r.length > interval.start {
-					resultIntervals = append(resultIntervals, Interval{r.dstStart + interval.start - r.srcStart, r.srcStart + r.length - interval.start})
+					resultIntervals = append(resultIntervals,
+						Interval{r.dstStart + interval.start - r.srcStart, r.srcStart + r.length - interval.start})
 				}
-				remainingIntervals = append(remainingIntervals, Interval{interval.start + r.length - (interval.start - r.srcStart), interval.length - (r.length - (interval.start - r.srcStart))})
+				remainingIntervals = append(remainingIntervals,
+					Interval{r.length + r.srcStart, interval.length - (r.length - (interval.start - r.srcStart))})
 			} else if interval.start+interval.length >= r.srcStart && interval.start+interval.length <= r.srcStart+r.length {
 				// interval ending in range but starting outside
 				if interval.start+interval.length > r.srcStart {
-					resultIntervals = append(resultIntervals, Interval{r.dstStart, interval.start + interval.length - r.srcStart})
+					resultIntervals = append(resultIntervals,
+						Interval{r.dstStart, interval.start + interval.length - r.srcStart})
 				}
-				remainingIntervals = append(remainingIntervals, Interval{interval.start, r.srcStart - interval.start})
+				remainingIntervals = append(remainingIntervals,
+					Interval{interval.start, r.srcStart - interval.start})
 			} else if interval.start < r.srcStart && interval.start+interval.length > r.srcStart+r.length {
 				// range completely within interval
 				resultIntervals = append(resultIntervals, Interval{r.dstStart, r.length})
-				remainingIntervals = append(remainingIntervals, Interval{interval.start, r.srcStart - interval.start})
-				remainingIntervals = append(remainingIntervals, Interval{interval.start + r.length, interval.length - (r.srcStart + r.length - interval.start)})
+				remainingIntervals = append(remainingIntervals,
+					Interval{interval.start, r.srcStart - interval.start},
+					Interval{interval.start + r.length, interval.length - (r.srcStart + r.length - interval.start)})
 			} else {
 				// range and interval not overlapping
 				remainingIntervals = append(remainingIntervals, interval)
 			}
 		}
 	}
+	// collect all intervals that couldn't be mapped (mapped by identity function)
 	if len(remainingIntervals) > 0 {
 		resultIntervals = append(resultIntervals, remainingIntervals...)
 	}
