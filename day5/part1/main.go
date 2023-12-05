@@ -7,17 +7,14 @@ import (
 	"os"
 )
 
-// Range represents a linear interval mapping between two intervals (of the same length).
 type Range struct {
 	DstStart uint64 `@Int`
 	SrcStart uint64 `@Int`
 	Length   uint64 `@Int`
 }
-
 type RangeList struct {
 	Ranges []Range `~":"+ ":" @@+`
 }
-
 type Input struct {
 	Seeds      []uint64    `"seeds" ":" @Int+`
 	RangeLists []RangeList `@@+`
@@ -31,10 +28,6 @@ func Map(src uint64, rl []Range) uint64 {
 	}
 	return src
 }
-
-// The idea here is to start with a list of seeds, and then apply the
-// interval mappings one after the other. The result is a list of numbers
-// whose lowest number is the answer.
 func main() {
 	fileName := "input.txt"
 	file, _ := os.OpenFile(fileName, os.O_RDONLY, 0)

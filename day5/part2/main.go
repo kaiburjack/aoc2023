@@ -7,23 +7,18 @@ import (
 	"os"
 )
 
-// Range represents a linear interval mapping between two intervals (of the same length).
 type Range struct {
 	DstStart uint64 `@Int`
 	SrcStart uint64 `@Int`
 	Length   uint64 `@Int`
 }
-
-// Interval represents a contiguous interval/sequence of numbers.
 type Interval struct {
 	Start  uint64 `@Int`
 	Length uint64 `@Int`
 }
-
 type RangeList struct {
 	Ranges []Range `~":"+ ":" @@+`
 }
-
 type Input struct {
 	Seeds      []Interval  `"seeds" ":" @@+`
 	RangeLists []RangeList `@@+`
