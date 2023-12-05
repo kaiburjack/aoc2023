@@ -3,140 +3,31 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io"
+	"github.com/alecthomas/participle/v2"
 	"os"
 )
 
 // Range represents a linear interval mapping between two intervals (of the same length).
 type Range struct {
-	dstStart uint64
-	srcStart uint64
-	length   uint64
+	DstStart uint64 `@Int`
+	SrcStart uint64 `@Int`
+	Length   uint64 `@Int`
 }
 
 // Interval represents a contiguous interval/sequence of numbers.
 type Interval struct {
-	start  uint64
-	length uint64
+	Start  uint64 `@Int`
+	Length uint64 `@Int`
 }
 
-//
-// ALL OF BELOW IS JUST PARSER INFRASTRUCTURE :D
-//
-
-type parser struct {
-	r *bufio.Reader
+type RangeList struct {
+	Ranges []Range `~":"+ ":" @@+`
 }
 
-func (p *parser) ws() {
-	for {
-		b, err := p.r.ReadByte()
-		if err == io.EOF {
-			return
-		}
-		if b != ' ' {
-			_ = p.r.UnreadByte()
-			break
-		}
-	}
+type Input struct {
+	Seeds      []Interval  `"seeds" ":" @@+`
+	RangeLists []RangeList `@@+`
 }
-
-func (p *parser) integer() uint64 {
-	var n uint64
-	for {
-		b, _ := p.r.ReadByte()
-		if b >= '0' && b <= '9' {
-			n = n*10 + uint64(b-'0')
-		} else {
-			_ = p.r.UnreadByte()
-			return n
-		}
-	}
-}
-
-func (p *parser) Range() Range {
-	dstStart := p.integer()
-	p.ws()
-	srcStart := p.integer()
-	p.ws()
-	length := p.integer()
-	return Range{dstStart, srcStart, length}
-}
-
-func (p *parser) RangeList() ([]Range, error) {
-	err := p.until(':')
-	if err == io.EOF {
-		return nil, err //
-	}
-	_ = p.expect("\n")
-	var ranges []Range
-	for {
-		r := p.Range()
-		ranges = append(ranges, r)
-		_ = p.expect("\n")
-		b, err := p.r.ReadByte()
-		if err == io.EOF {
-			return ranges, nil
-		}
-		if b == '\n' {
-			break
-		} else {
-			_ = p.r.UnreadByte()
-		}
-	}
-	return ranges, nil
-}
-
-func (p *parser) seed() Interval {
-	p.ws()
-	start := p.integer()
-	p.ws()
-	length := p.integer()
-	return Interval{start, length}
-}
-
-func (p *parser) Seeds() []Interval {
-	var seeds []Interval
-	_ = p.expect("seeds:")
-	for {
-		s := p.seed()
-		seeds = append(seeds, s)
-		b, _ := p.r.ReadByte()
-		if b == '\n' {
-			break
-		}
-	}
-	return seeds
-}
-
-func (p *parser) expect(s string) error {
-	for i := 0; i < len(s); i++ {
-		b, _ := p.r.ReadByte()
-		if b != s[i] {
-			return fmt.Errorf("expected %s, got %s", s, string(b))
-		}
-	}
-	return nil
-}
-
-func (p *parser) until(e byte) error {
-	for {
-		b, err := p.r.ReadByte()
-		if err == io.EOF {
-			return err //
-		}
-		if b == e {
-			break
-		}
-	}
-	return nil
-}
-
-//
-// END OF PARSER INFRASTRUCTURE :D
-//
-
-// Below is the actual "implementation"
 
 func Map(inputIntervals []Interval, ranges []Range) []Interval {
 	var resultIntervals []Interval               // <- final mapping results
@@ -147,32 +38,32 @@ func Map(inputIntervals []Interval, ranges []Range) []Interval {
 		for _, interval := range inputIntervals {
 			inputIntervals = inputIntervals[1:]
 			// Consider all cases:
-			if interval.start >= r.srcStart && interval.start+interval.length <= r.srcStart+r.length {
+			if interval.Start >= r.SrcStart && interval.Start+interval.Length <= r.SrcStart+r.Length {
 				// interval completely within range
 				resultIntervals = append(resultIntervals,
-					Interval{r.dstStart + interval.start - r.srcStart, interval.length})
-			} else if interval.start >= r.srcStart && interval.start <= r.srcStart+r.length {
-				// interval starting in range but ending outside
-				if r.srcStart+r.length > interval.start {
+					Interval{r.DstStart + interval.Start - r.SrcStart, interval.Length})
+			} else if interval.Start >= r.SrcStart && interval.Start <= r.SrcStart+r.Length {
+				// interval.Starting in range but ending outside
+				if r.SrcStart+r.Length > interval.Start {
 					resultIntervals = append(resultIntervals,
-						Interval{r.dstStart + interval.start - r.srcStart, r.srcStart + r.length - interval.start})
+						Interval{r.DstStart + interval.Start - r.SrcStart, r.SrcStart + r.Length - interval.Start})
 				}
 				remainingIntervals = append(remainingIntervals,
-					Interval{r.length + r.srcStart, interval.length - (r.length - (interval.start - r.srcStart))})
-			} else if interval.start+interval.length >= r.srcStart && interval.start+interval.length <= r.srcStart+r.length {
-				// interval ending in range but starting outside
-				if interval.start+interval.length > r.srcStart {
+					Interval{r.Length + r.SrcStart, interval.Length - (r.Length - (interval.Start - r.SrcStart))})
+			} else if interval.Start+interval.Length >= r.SrcStart && interval.Start+interval.Length <= r.SrcStart+r.Length {
+				// interval ending in range but.Starting outside
+				if interval.Start+interval.Length > r.SrcStart {
 					resultIntervals = append(resultIntervals,
-						Interval{r.dstStart, interval.start + interval.length - r.srcStart})
+						Interval{r.DstStart, interval.Start + interval.Length - r.SrcStart})
 				}
 				remainingIntervals = append(remainingIntervals,
-					Interval{interval.start, r.srcStart - interval.start})
-			} else if interval.start < r.srcStart && interval.start+interval.length > r.srcStart+r.length {
+					Interval{interval.Start, r.SrcStart - interval.Start})
+			} else if interval.Start < r.SrcStart && interval.Start+interval.Length > r.SrcStart+r.Length {
 				// range completely within interval
-				resultIntervals = append(resultIntervals, Interval{r.dstStart, r.length})
+				resultIntervals = append(resultIntervals, Interval{r.DstStart, r.Length})
 				remainingIntervals = append(remainingIntervals,
-					Interval{interval.start, r.srcStart - interval.start},
-					Interval{interval.start + r.length, interval.length - (r.srcStart + r.length - interval.start)})
+					Interval{interval.Start, r.SrcStart - interval.Start},
+					Interval{interval.Start + r.Length, interval.Length - (r.SrcStart + r.Length - interval.Start)})
 			} else {
 				// range and interval not overlapping
 				remainingIntervals = append(remainingIntervals, interval)
@@ -187,25 +78,17 @@ func Map(inputIntervals []Interval, ranges []Range) []Interval {
 }
 
 func main() {
-	file, _ := os.OpenFile("input.txt", os.O_RDONLY, 0)
-	r := bufio.NewReader(file)
-	p := parser{r}
-	// parse list of seed intervals
-	intervals := p.Seeds()
-
-	// parse list of interval mappings
-	for {
-		rl, err := p.RangeList()
-		if err == io.EOF {
-			break
-		}
-		intervals = Map(intervals, rl)
+	fileName := "input.txt"
+	file, _ := os.OpenFile(fileName, os.O_RDONLY, 0)
+	parser, _ := participle.Build[Input]()
+	input, _ := parser.Parse(fileName, bufio.NewReader(file))
+	intervals := input.Seeds
+	for _, r := range input.RangeLists {
+		intervals = Map(intervals, r.Ranges)
 	}
-
-	// find lowest number
-	var lowest = intervals[0].start
+	var lowest = intervals[0].Start
 	for i := 1; i < len(intervals); i++ {
-		lowest = min(lowest, intervals[i].start)
+		lowest = min(lowest, intervals[i].Start)
 	}
 	fmt.Printf("lowest: %d\n", lowest)
 }
