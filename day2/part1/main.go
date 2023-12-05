@@ -2,142 +2,47 @@ package main
 
 import (
 	"bufio"
-	"io"
+	"github.com/alecthomas/participle/v2"
 	"os"
 )
 
-type game struct {
-	id    int
-	draws []draw
+type Game struct {
+	Id    int    `"Game" @Int ":"`
+	Draws []Draw `@@+`
 }
 
-type draw struct {
-	colors [3]int // <- always in the order: [red, green, blue]
+type Draw struct {
+	Colors []Color `@@+ ";"?`
 }
 
-type parser struct {
-	r *bufio.Reader
+type Color struct {
+	Red   int `@Int "red" ","?`
+	Green int `| @Int "green" ","?`
+	Blue  int `| @Int "blue" ","?`
 }
 
-func (p *parser) color() int {
-	b, _ := p.r.ReadByte()
-	var c int
-	switch b {
-	case 'r':
-		_ = p.expect("ed")
-		c = 0
-	case 'g':
-		_ = p.expect("reen")
-		c = 1
-	case 'b':
-		_ = p.expect("lue")
-		c = 2
-	}
-	return c
-}
-
-func (p *parser) game() (game, error) {
-	var g game
-	err := p.expect("Game ")
-	if err == io.EOF {
-		return game{}, err
-	}
-	g.id = p.integer()
-	_ = p.expect(":")
-	for {
-		p.ws()
-		d, _ := p.draw()
-		g.draws = append(g.draws, d)
-		b, err := p.r.ReadByte()
-		if err == io.EOF {
-			break
-		}
-		if b == '\n' {
-			break
-		}
-	}
-	return g, nil
-}
-
-func (p *parser) draw() (draw, error) {
-	var d draw
-	for {
-		p.ws()
-		count := p.integer()
-		p.ws()
-		col := p.color()
-		d.colors[col] += count
-		b, err := p.r.ReadByte()
-		if err == io.EOF {
-			break
-		}
-		if b == ',' {
-			continue
-		} else if b == ';' {
-			_ = p.r.UnreadByte()
-			break
-		} else if b == '\n' {
-			_ = p.r.UnreadByte()
-			break
-		}
-	}
-	return d, nil
-}
-
-func (p *parser) ws() {
-	for {
-		b, _ := p.r.ReadByte()
-		if b != ' ' {
-			_ = p.r.UnreadByte()
-			break
-		}
-	}
-}
-
-func (p *parser) expect(s string) error {
-	for i := 0; i < len(s); i++ {
-		_, err := p.r.ReadByte()
-		if err == io.EOF {
-			return err
-		}
-	}
-	return nil
-}
-
-func (p *parser) integer() int {
-	var n int
-	for {
-		b, _ := p.r.ReadByte()
-		if b >= '0' && b <= '9' {
-			n = n*10 + int(b-'0')
-		} else {
-			_ = p.r.UnreadByte()
-			return n
-		}
-	}
+type Input struct {
+	Games []Game `@@+`
 }
 
 func main() {
-	file, _ := os.OpenFile("input.txt", os.O_RDONLY, 0)
-	r := bufio.NewReader(file)
-	p := parser{r}
+	fileName := "input.txt"
+	file, _ := os.OpenFile(fileName, os.O_RDONLY, 0)
+	parser, _ := participle.Build[Input]()
+	input, _ := parser.Parse(fileName, bufio.NewReader(file))
 	sumOfIds := 0
 	cubes := [3]int{12, 13, 14}
-	for {
-		g, err := p.game()
-		if err == io.EOF {
-			break
-		}
+	for _, g := range input.Games {
 		possible := true
-		for _, d := range g.draws {
-			for i := 0; i < 3; i++ {
-				if d.colors[i] > cubes[i] {
+		for _, d := range g.Draws {
+			for _, c := range d.Colors {
+				if c.Red > cubes[0] || c.Green > cubes[1] || c.Blue > cubes[2] {
 					possible = false
 				}
 			}
 		}
 		if possible {
-			sumOfIds += g.id
+			sumOfIds += g.Id
 		}
 	}
 	println(sumOfIds)
