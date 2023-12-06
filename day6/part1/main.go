@@ -22,15 +22,7 @@ func solveQuadratic(maxTime, minDistance float64) (int64, int64) {
 	// t = (-b ± √(b² - 4ac))/2a
 	var r0 = (maxTime - math.Sqrt(maxTime*maxTime-4.0*minDistance)) * 0.5
 	var r1 = (maxTime + math.Sqrt(maxTime*maxTime-4.0*minDistance)) * 0.5
-	if r0 == float64(int64(r0)) {
-		// corner case for when r0 is exactly an integer, in which case this integer is NOT a solution
-		r0 += 1
-	}
-	if r1 == float64(int64(r1)) {
-		// corner case for when r1 is exactly an integer, in which case this integer is NOT a solution
-		r1 -= 1
-	}
-	return int64(math.Ceil(r0)), int64(math.Floor(r1))
+	return int64(math.Floor(r0 + 1)), int64(math.Ceil(r1 - 1))
 }
 
 func main() {
