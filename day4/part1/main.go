@@ -12,7 +12,7 @@ type Input struct {
 }
 
 type Card struct {
-	WinningNumbers []int `"Card" Int+ ":" @Int+`
+	WinningNumbers []int `"Card" Int ":" @Int+`
 	MyNumbers      []int `"|" @Int+`
 }
 
