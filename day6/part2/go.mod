@@ -1,4 +1,4 @@
-module day6part1
+module day6part2
 
 go 1.21.4
 
