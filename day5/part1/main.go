@@ -22,7 +22,7 @@ type Input struct {
 
 func Map(src uint64, rl []Range) uint64 {
 	for i := 0; i < len(rl); i++ {
-		if src >= rl[i].SrcStart && src <= rl[i].SrcStart+rl[i].Length {
+		if src >= rl[i].SrcStart && src < rl[i].SrcStart+rl[i].Length {
 			return rl[i].DstStart + (src - rl[i].SrcStart)
 		}
 	}
