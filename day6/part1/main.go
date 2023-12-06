@@ -40,7 +40,7 @@ func main() {
 	input, _ := parser.Parse(fileName, bufio.NewReader(file))
 	var product int64 = 1
 	for i := 0; i < len(input.Times); i++ {
-		var minTime, maxTime = solveQuadratic(input.Times[i], input.Distances[i])
+		minTime, maxTime := solveQuadratic(input.Times[i], input.Distances[i])
 		product *= maxTime - minTime + 1
 	}
 	println(product)

@@ -42,6 +42,6 @@ func main() {
 	input, _ := parser.Parse(fileName, bufio.NewReader(file))
 	timeAsFloat64, _ := strconv.ParseFloat(strings.ReplaceAll(input.Time, " ", ""), 64)
 	distanceAsFloat64, _ := strconv.ParseFloat(strings.ReplaceAll(input.Distance, " ", ""), 64)
-	var minTime, maxTime = solveQuadratic(timeAsFloat64, distanceAsFloat64)
+	minTime, maxTime := solveQuadratic(timeAsFloat64, distanceAsFloat64)
 	println(maxTime - minTime + 1)
 }
