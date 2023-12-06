@@ -8,8 +8,8 @@ import (
 )
 
 type Input struct {
-	Times     []float64 `"Time" ":" @Int+`
-	Distances []float64 `"Distance" ":" @Int+`
+	Times     []float64 `parser:"'Time' ':' @Int+"`
+	Distances []float64 `parser:"'Distance' ':' @Int+"`
 }
 
 // The puzzle is actually a mathematical solution to a quadratic equation

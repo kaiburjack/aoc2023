@@ -8,20 +8,20 @@ import (
 )
 
 type Range struct {
-	DstStart uint64 `@Int`
-	SrcStart uint64 `@Int`
-	Length   uint64 `@Int`
+	DstStart uint64 `parser:"@Int"`
+	SrcStart uint64 `parser:"@Int"`
+	Length   uint64 `parser:"@Int"`
 }
 type Interval struct {
-	Start  uint64 `@Int`
-	Length uint64 `@Int`
+	Start  uint64 `parser:"@Int"`
+	Length uint64 `parser:"@Int"`
 }
 type RangeList struct {
-	Ranges []Range `~":"+ ":" @@+`
+	Ranges []Range `parser:"~':'+ ':' @@+"`
 }
 type Input struct {
-	Seeds      []Interval  `"seeds" ":" @@+`
-	RangeLists []RangeList `@@+`
+	Seeds      []Interval  `parser:"'seeds' ':' @@+"`
+	RangeLists []RangeList `parser:"@@+"`
 }
 
 func Map(inputIntervals []Interval, ranges []Range) []Interval {

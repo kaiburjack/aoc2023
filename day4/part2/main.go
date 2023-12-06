@@ -8,12 +8,12 @@ import (
 )
 
 type Input struct {
-	Cards []Card `@@+`
+	Cards []Card `parser:"@@+"`
 }
 
 type Card struct {
-	WinningNumbers []int `"Card" Int ":" @Int+`
-	MyNumbers      []int `"|" @Int+`
+	WinningNumbers []int `parser:"'Card' Int ':' @Int+"`
+	MyNumbers      []int `parser:"'|' @Int+"`
 }
 
 func numberOfWinningNumbers(c Card) int {

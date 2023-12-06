@@ -7,22 +7,22 @@ import (
 )
 
 type Game struct {
-	Id    int    `"Game" @Int ":"`
-	Draws []Draw `@@+`
+	Id    int    `parser:"'Game' @Int ':'"`
+	Draws []Draw `parser:"@@+"`
 }
 
 type Draw struct {
-	Colors []Color `@@+ ";"?`
+	Colors []Color `parser:"@@+ ';'?"`
 }
 
 type Color struct {
-	Red   int `@Int "red" ","?`
-	Green int `| @Int "green" ","?`
-	Blue  int `| @Int "blue" ","?`
+	Red   int `parser:"  @Int 'red' ','?"`
+	Green int `parser:"| @Int 'green' ','?"`
+	Blue  int `parser:"| @Int 'blue' ','?"`
 }
 
 type Input struct {
-	Games []Game `@@+`
+	Games []Game `parser:"@@+"`
 }
 
 func main() {

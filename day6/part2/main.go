@@ -10,8 +10,8 @@ import (
 )
 
 type Input struct {
-	Time     string `"Time" ":" @(Int+)`
-	Distance string `"Distance" ":" @(Int+)`
+	Time     string `parser:"'Time' ':' @(Int+)"`
+	Distance string `parser:"'Distance' ':' @(Int+)"`
 }
 
 // The puzzle is actually a mathematical solution to a quadratic equation
