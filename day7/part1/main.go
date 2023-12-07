@@ -17,20 +17,13 @@ type Hand struct {
 
 func ofAKind(n int) func([]byte) bool {
 	return func(hand []byte) bool {
-		counts := distinctCountsDescending(hand)
-		return counts[0] >= n
+		return distinctCountsDescending(hand)[0] >= n
 	}
 }
 
 func detectTwoPairs(hand []byte) bool {
 	counts := distinctCountsDescending(hand)
-	pairs := 0
-	for i := 0; i < len(counts); i++ {
-		if counts[i] >= 2 {
-			pairs++
-		}
-	}
-	return pairs >= 2
+	return counts[0] >= 2 && counts[1] >= 2
 }
 
 func distinctCountsDescending(hand []byte) []int {
@@ -38,7 +31,7 @@ func distinctCountsDescending(hand []byte) []int {
 	for i := 0; i < len(hand); i++ {
 		different[hand[i]]++
 	}
-	var counts []int
+	counts := make([]int, 0, len(different))
 	for _, v := range different {
 		counts = append(counts, v)
 	}
@@ -50,15 +43,9 @@ func distinctCountsDescending(hand []byte) []int {
 func detectFullHouse(cardsWithoutJs []byte) bool {
 	counts := distinctCountsDescending(cardsWithoutJs)
 	if len(counts) == 1 {
-		if counts[0] >= 5 {
-			return true
-		}
+		return counts[0] >= 5
 	} else if len(counts) == 2 {
-		if counts[0] == 3 && counts[1] >= 2 {
-			return true
-		} else if counts[0] == 2 && counts[1] >= 3 {
-			return true
-		}
+		return counts[0] == 3 && counts[1] >= 2 || counts[0] == 2 && counts[1] >= 3
 	}
 	return false
 }
@@ -81,7 +68,7 @@ func determineTypeOfHand(cardsWithoutJs []byte) int {
 	return 0
 }
 
-func firstDifference(a, b []byte) int {
+func indexOfFirstDifference(a, b []byte) int {
 	for i := 0; i < len(a); i++ {
 		if a[i] != b[i] {
 			return i
@@ -112,7 +99,7 @@ func main() {
 		} else if a.type_ > b.type_ {
 			return 1
 		} else {
-			i := firstDifference(a.cards, b.cards)
+			i := indexOfFirstDifference(a.cards, b.cards)
 			k := bytes.IndexByte(ORDER, a.cards[i])
 			j := bytes.IndexByte(ORDER, b.cards[i])
 			if k < j {
