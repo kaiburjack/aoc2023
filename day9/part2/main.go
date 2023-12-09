@@ -11,11 +11,10 @@ func extrapolationsSum(numbers []int64) int64 {
 	if len(numbers) <= 1 {
 		return 0
 	}
-	first := numbers[0]
-	for i := 0; i < len(numbers)-1; i++ {
-		numbers[i] = numbers[i+1] - numbers[i]
+	for i := len(numbers) - 1; i > 0; i-- {
+		numbers[i] = numbers[i] - numbers[i-1]
 	}
-	return first - extrapolationsSum(numbers[:len(numbers)-1])
+	return numbers[0] - extrapolationsSum(numbers[1:])
 }
 
 func main() {
