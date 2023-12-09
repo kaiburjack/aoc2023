@@ -11,11 +11,11 @@ func extrapolationsSum(numbers []int64) int64 {
 	if len(numbers) <= 1 {
 		return 0
 	}
-	differences := make([]int64, len(numbers)-1)
+	first := numbers[0]
 	for i := 0; i < len(numbers)-1; i++ {
-		differences[i] = numbers[i+1] - numbers[i]
+		numbers[i] = numbers[i+1] - numbers[i]
 	}
-	return numbers[0] - extrapolationsSum(differences)
+	return first - extrapolationsSum(numbers[:len(numbers)-1])
 }
 
 func main() {
@@ -23,11 +23,13 @@ func main() {
 	fileScanner := bufio.NewScanner(readFile)
 	fileScanner.Split(bufio.ScanLines)
 	var sumOfSums int64
+	numbers := make([]int64, 0)
 	for fileScanner.Scan() {
+		numbers = numbers[:0]
 		words := strings.Split(fileScanner.Text(), " ")
-		numbers := make([]int64, len(words))
-		for i, word := range words {
-			numbers[i], _ = strconv.ParseInt(word, 10, 64)
+		for _, word := range words {
+			n, _ := strconv.ParseInt(word, 10, 64)
+			numbers = append(numbers, n)
 		}
 		sumOfSums += extrapolationsSum(numbers)
 	}
