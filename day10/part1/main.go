@@ -36,7 +36,7 @@ func hasPipe(pipes [][]*pipe, x, y int) bool {
 // pipeKindBySurroundings determines the kind of a pipe based on its
 // neighbors and their respective pipe kinds
 // We use this for the "S" pipe
-func pipeKindBySurroundings(pipes [][]*pipe, pip *pipe) {
+func pipeKindBySurroundings(pipes [][]*pipe, pip *pipe) pipeKind {
 	for i, o := range directions {
 		if hasPipe(pipes, pip.x+o[0], pip.y+o[1]) &&
 			pipes[pip.y+o[1]][pip.x+o[0]].kind.connectors&(1<<i) != 0 {
@@ -45,10 +45,10 @@ func pipeKindBySurroundings(pipes [][]*pipe, pip *pipe) {
 	}
 	for _, v := range pipeKinds {
 		if v.connectors == pipes[pip.y][pip.x].kind.connectors {
-			pipes[pip.y][pip.x].kind = v
-			return
+			return v
 		}
 	}
+	panic("no pipe kind found")
 }
 
 // connect connects a pipe to its neighbours based on its kind
@@ -93,7 +93,7 @@ func main() {
 	}
 
 	// determine pipe kind of "S"
-	pipeKindBySurroundings(rows, start)
+	start.kind = pipeKindBySurroundings(rows, start)
 
 	// connect all pipes to their neighbours
 	for y := 0; y < len(rows); y++ {
