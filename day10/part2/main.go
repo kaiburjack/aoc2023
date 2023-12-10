@@ -185,9 +185,7 @@ func depthFirstSearchForExit1(pipes [][]*pipe, dir, x, y, g int, constraints int
 					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^1, tested)
 				}
 			} else if dir == 3 {
-				if constraints&8 != 0 {
-					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^4, tested)
-				}
+				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^4, tested)
 				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^1, tested)
 				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^0, tested)
 			} else if dir == 2 {
