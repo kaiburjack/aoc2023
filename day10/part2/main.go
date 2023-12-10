@@ -15,7 +15,7 @@ type pipe struct {
 	neighbours []*pipe
 	x, y       int
 	isLoop     bool
-	g          int
+	visited    bool
 	isOuter    bool
 }
 
@@ -76,13 +76,16 @@ func depthFirstSearchForExit1(pipes [][]*pipe, dir, x, y, g int, constraints int
 	}
 	pip := pipes[y][x]
 	if pip.isOuter {
-		// this pipe was already marked as being an outer part
 		return true
-	} else if pip.g == g {
-		// this pipe was already visited in this generation
-		return false
+	} else if pip.visited {
+		// this pipe was already visited
+		// return what the previous search found
+		return pip.isOuter
 	}
-	pip.g = g // <- mark this pipe as visited in this generation
+	// mark this pipe as visited (forever)
+	// either we end up with finding an exit
+	// or this pipe is forever part of the inner pipes
+	pip.visited = true
 	var leftOk, rightOk, upOk, downOk bool
 	if !pip.isLoop {
 		// if this pipe is not part of the loop,
@@ -301,10 +304,10 @@ func main() {
 		for _, p := range pipesInRow {
 			if p == '.' {
 				// here, we handle "." as a pipe with kind ""
-				row = append(row, &pipe{kind: pipeKind{"", 0}, x: len(row), y: len(rows), g: 10000000})
+				row = append(row, &pipe{kind: pipeKind{"", 0}, x: len(row), y: len(rows)})
 				continue
 			}
-			pip := &pipe{x: len(row), y: len(rows), kind: pipeKinds[string(p)], g: 10000000}
+			pip := &pipe{x: len(row), y: len(rows), kind: pipeKinds[string(p)]}
 			row = append(row, pip)
 			if p == 'S' {
 				start = pip
