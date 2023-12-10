@@ -69,7 +69,7 @@ func connect(rows [][]*pipe, pip *pipe) {
 	}
 }
 
-func depthFirstSearchForExit1(pipes [][]*pipe, dir, x, y, g int, constraints int, tested *[]*pipe) bool {
+func depthFirstSearchForExit1(pipes [][]*pipe, dir, x, y int, constraints int, tested *[]*pipe) bool {
 	if !hasPipe(pipes, x, y) {
 		// if we reached the edge of the grid, we found an exit
 		return true
@@ -92,10 +92,10 @@ func depthFirstSearchForExit1(pipes [][]*pipe, dir, x, y, g int, constraints int
 		// treat it as if it was an empty tile
 		// and go in all directions without restrictions
 		*tested = append(*tested, pip)
-		leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^0, tested)
-		rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^0, tested)
-		upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^0, tested)
-		downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^0, tested)
+		leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^0, tested)
+		rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^0, tested)
+		upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^0, tested)
+		downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^0, tested)
 	} else {
 		// test for every case (pipe kind and direction)
 		// and put constraints on the recursive calls if
@@ -103,162 +103,162 @@ func depthFirstSearchForExit1(pipes [][]*pipe, dir, x, y, g int, constraints int
 		// parallel, adjacent pipes.
 		if pip.kind.kind == "-" {
 			if dir == 1 {
-				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, constraints, tested)
+				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, constraints, tested)
 				if constraints&4 != 0 {
-					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^0, tested)
+					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^0, tested)
 				}
 				if constraints&8 != 0 {
-					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^0, tested)
+					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^0, tested)
 				}
 			} else if dir == 3 {
-				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, constraints, tested)
+				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, constraints, tested)
 				if constraints&4 != 0 {
-					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^0, tested)
+					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^0, tested)
 				}
 				if constraints&8 != 0 {
-					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^0, tested)
+					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^0, tested)
 				}
 			} else if dir == 2 {
-				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^8, tested)
-				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^8, tested)
+				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^8, tested)
+				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^8, tested)
 			} else if dir == 4 {
-				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^4, tested)
-				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^4, tested)
+				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^4, tested)
+				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^4, tested)
 			}
 		} else if pip.kind.kind == "|" {
 			if dir == 1 {
-				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^2, tested)
-				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^2, tested)
+				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^2, tested)
+				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^2, tested)
 			} else if dir == 3 {
-				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^1, tested)
-				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^1, tested)
+				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^1, tested)
+				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^1, tested)
 			} else if dir == 2 {
 				if constraints&1 != 0 {
-					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^2, tested)
+					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^2, tested)
 				}
 				if constraints&2 != 0 {
-					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^1, tested)
+					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^1, tested)
 				}
-				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, constraints, tested)
+				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, constraints, tested)
 			} else if dir == 4 {
 				if constraints&1 != 0 {
-					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^2, tested)
+					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^2, tested)
 				}
 				if constraints&2 != 0 {
-					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^1, tested)
+					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^1, tested)
 				}
-				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, constraints, tested)
+				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, constraints, tested)
 			}
 		} else if pip.kind.kind == "F" {
 			if dir == 1 {
-				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^8, tested)
-				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^0, tested)
-				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^2, tested)
+				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^8, tested)
+				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^0, tested)
+				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^2, tested)
 			} else if dir == 3 {
 				if constraints&4 != 0 {
-					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^0, tested)
-					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^0, tested)
-					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^2, tested)
+					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^0, tested)
+					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^0, tested)
+					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^2, tested)
 				}
 				if constraints&8 != 0 {
-					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^1, tested)
+					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^1, tested)
 				}
 			} else if dir == 2 {
-				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^0, tested)
-				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^8, tested)
-				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^2, tested)
+				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^0, tested)
+				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^8, tested)
+				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^2, tested)
 			} else if dir == 4 {
 				if constraints&1 != 0 {
-					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^0, tested)
-					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^0, tested)
-					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^8, tested)
+					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^0, tested)
+					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^0, tested)
+					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^8, tested)
 				}
 				if constraints&2 != 0 {
-					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^4, tested)
+					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^4, tested)
 				}
 			}
 		} else if pip.kind.kind == "J" {
 			if dir == 1 {
 				if constraints&4 != 0 {
-					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^2, tested)
+					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^2, tested)
 				}
 				if constraints&8 != 0 {
-					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^0, tested)
-					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^0, tested)
-					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^1, tested)
+					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^0, tested)
+					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^0, tested)
+					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^1, tested)
 				}
 			} else if dir == 3 {
-				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^4, tested)
-				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^1, tested)
-				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^0, tested)
+				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^4, tested)
+				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^1, tested)
+				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^0, tested)
 			} else if dir == 2 {
 				if constraints&1 != 0 {
-					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^8, tested)
+					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^8, tested)
 				}
 				if constraints&2 != 0 {
-					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^0, tested)
-					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^0, tested)
-					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^4, tested)
+					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^0, tested)
+					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^0, tested)
+					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^4, tested)
 				}
 			} else if dir == 4 {
-				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^4, tested)
-				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^0, tested)
-				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^1, tested)
+				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^4, tested)
+				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^0, tested)
+				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^1, tested)
 			}
 		} else if pip.kind.kind == "L" {
 			if dir == 1 {
-				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^4, tested)
-				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^0, tested)
-				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^2, tested)
+				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^4, tested)
+				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^0, tested)
+				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^2, tested)
 			} else if dir == 3 {
 				if constraints&4 != 0 {
-					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^1, tested)
+					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^1, tested)
 				}
 				if constraints&8 != 0 {
-					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^0, tested)
-					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^0, tested)
-					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^2, tested)
+					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^0, tested)
+					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^0, tested)
+					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^2, tested)
 				}
 			} else if dir == 2 {
 				if constraints&1 != 0 {
-					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^0, tested)
-					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^0, tested)
-					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^4, tested)
+					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^0, tested)
+					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^0, tested)
+					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^4, tested)
 				}
 				if constraints&2 != 0 {
-					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^8, tested)
+					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^8, tested)
 				}
 			} else if dir == 4 {
-				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^0, tested)
-				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^4, tested)
-				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^2, tested)
+				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^0, tested)
+				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^4, tested)
+				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^2, tested)
 			}
 		} else if pip.kind.kind == "7" {
 			if dir == 1 {
 				if constraints&4 != 0 {
-					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^0, tested)
-					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^0, tested)
-					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^1, tested)
+					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^0, tested)
+					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^0, tested)
+					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^1, tested)
 				}
 				if constraints&8 != 0 {
-					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^2, tested)
+					downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^2, tested)
 				}
 			} else if dir == 3 {
-				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^0, tested)
-				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^1, tested)
-				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^8, tested)
+				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^0, tested)
+				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^1, tested)
+				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^8, tested)
 			} else if dir == 2 {
-				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^8, tested)
-				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^0, tested)
-				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, g, ^1, tested)
+				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^8, tested)
+				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^0, tested)
+				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^1, tested)
 			} else if dir == 4 {
 				if constraints&1 != 0 {
-					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^4, tested)
+					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^4, tested)
 				}
 				if constraints&2 != 0 {
-					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, g, ^0, tested)
-					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, g, ^0, tested)
-					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, g, ^8, tested)
+					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^0, tested)
+					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^0, tested)
+					leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^8, tested)
 				}
 			}
 		}
@@ -267,7 +267,6 @@ func depthFirstSearchForExit1(pipes [][]*pipe, dir, x, y, g int, constraints int
 }
 
 func depthFirstSearchForExit(pipes [][]*pipe) int {
-	g := 0 // <- generation of current search
 	outer := make(map[*pipe]bool)
 	for y := 0; y < len(pipes); y++ {
 		for x := 0; x < len(pipes[y]); x++ {
@@ -277,7 +276,7 @@ func depthFirstSearchForExit(pipes [][]*pipe) int {
 				// (from start to start), so we can skip it
 				continue
 			}
-			if depthFirstSearchForExit1(pipes, -1, x, y, g, ^0, &tested) {
+			if depthFirstSearchForExit1(pipes, -1, x, y, ^0, &tested) {
 				// mark all pipes as being outer pipes
 				for _, v := range tested {
 					outer[v] = true
@@ -333,22 +332,19 @@ func main() {
 
 	// find length of the loop
 	d := 0
-	var cameFrom = start
 	var next = start
 	for {
 		d++
 		next.isLoop = true
 		// find one of the two neighbors which does
-		// not lead us back to where we came from
-		for _, n := range next.neighbours {
-			if n == cameFrom {
-				continue
-			}
-			cameFrom = next
-			next = n
-			break
+		// not lead us to a pipe that we already marked
+		// as being part of the loop
+		n := next.neighbours[0]
+		if n.isLoop {
+			n = next.neighbours[1]
 		}
-		if next == start {
+		next = n
+		if next.isLoop {
 			// we are back at the start
 			break
 		}

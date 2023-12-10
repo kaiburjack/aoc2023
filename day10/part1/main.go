@@ -108,20 +108,18 @@ func main() {
 
 	// find length of the loop
 	d := 0
-	var cameFrom = start
+	var last = start
 	var next = start
 	for {
 		d++
 		// find one of the two neighbors which does
 		// not lead us back to where we came from
-		for _, n := range next.neighbours {
-			if n == cameFrom {
-				continue
-			}
-			cameFrom = next
-			next = n
-			break
+		n := next.neighbours[0]
+		if n == last {
+			n = next.neighbours[1]
 		}
+		last = next
+		next = n
 		if next == start {
 			// we are back at the start
 			break
