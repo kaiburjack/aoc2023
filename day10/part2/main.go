@@ -42,8 +42,8 @@ func hasPipe(pipes [][]*pipe, x, y int) bool {
 func pipeKindBySurroundings(pipes [][]*pipe, pip *pipe) pipeKind {
 	for i, o := range directions {
 		if hasPipe(pipes, pip.x+o[0], pip.y+o[1]) &&
-			pipes[pip.y+o[1]][pip.x+o[0]].kind.connectors&(1<<i) != 0 {
-			pipes[pip.y][pip.x].kind.connectors |= 1 << ((i + 2) & 3)
+			pipes[pip.y+o[1]][pip.x+o[0]].kind.connectors&(1<<((i+2)&3)) != 0 {
+			pipes[pip.y][pip.x].kind.connectors |= 1 << i
 		}
 	}
 	for _, v := range pipeKinds {
