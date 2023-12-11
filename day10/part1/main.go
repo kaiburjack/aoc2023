@@ -6,7 +6,6 @@ import (
 )
 
 type pipeKind struct {
-	kind       string
 	connectors int
 }
 
@@ -17,16 +16,16 @@ type pipe struct {
 }
 
 var pipeKinds map[string]pipeKind
-var directions = [][]int{{1, 0}, {0, 1}, {-1, 0}, {0, -1}}
+var directions = [4][2]int{{1, 0}, {0, 1}, {-1, 0}, {0, -1}}
 
 func init() {
 	pipeKinds = make(map[string]pipeKind)
-	pipeKinds["F"] = pipeKind{"F", 1 | 2}
-	pipeKinds["|"] = pipeKind{"|", 2 | 8}
-	pipeKinds["-"] = pipeKind{"-", 1 | 4}
-	pipeKinds["L"] = pipeKind{"L", 1 | 8}
-	pipeKinds["7"] = pipeKind{"7", 2 | 4}
-	pipeKinds["J"] = pipeKind{"J", 4 | 8}
+	pipeKinds["F"] = pipeKind{1 | 2}
+	pipeKinds["|"] = pipeKind{2 | 8}
+	pipeKinds["-"] = pipeKind{1 | 4}
+	pipeKinds["L"] = pipeKind{1 | 8}
+	pipeKinds["7"] = pipeKind{2 | 4}
+	pipeKinds["J"] = pipeKind{4 | 8}
 }
 
 func hasPipe(pipes [][]*pipe, x, y int) bool {

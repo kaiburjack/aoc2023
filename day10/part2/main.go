@@ -6,7 +6,6 @@ import (
 )
 
 type pipeKind struct {
-	kind       string
 	connectors int
 }
 
@@ -20,16 +19,17 @@ type pipe struct {
 }
 
 var pipeKinds map[string]pipeKind
-var directions = [][]int{{1, 0}, {0, 1}, {-1, 0}, {0, -1}}
+
+var directions = [4][2]int{{1, 0}, {0, 1}, {-1, 0}, {0, -1}}
 
 func init() {
 	pipeKinds = make(map[string]pipeKind)
-	pipeKinds["F"] = pipeKind{"F", 1 | 2}
-	pipeKinds["|"] = pipeKind{"|", 2 | 8}
-	pipeKinds["-"] = pipeKind{"-", 1 | 4}
-	pipeKinds["L"] = pipeKind{"L", 1 | 8}
-	pipeKinds["7"] = pipeKind{"7", 2 | 4}
-	pipeKinds["J"] = pipeKind{"J", 4 | 8}
+	pipeKinds["F"] = pipeKind{1 | 2}
+	pipeKinds["|"] = pipeKind{2 | 8}
+	pipeKinds["-"] = pipeKind{1 | 4}
+	pipeKinds["L"] = pipeKind{1 | 8}
+	pipeKinds["7"] = pipeKind{2 | 4}
+	pipeKinds["J"] = pipeKind{4 | 8}
 }
 
 func hasPipe(pipes [][]*pipe, x, y int) bool {
@@ -101,7 +101,7 @@ func depthFirstSearchForExit1(pipes [][]*pipe, dir, x, y int, constraints int, t
 		// and put constraints on the recursive calls if
 		// we need to "hug" a pipe to squeeze through
 		// parallel, adjacent pipes.
-		if pip.kind.kind == "-" {
+		if pip.kind.connectors == 1|4 {
 			if dir == 1 {
 				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, constraints, tested)
 				if constraints&4 != 0 {
@@ -125,7 +125,7 @@ func depthFirstSearchForExit1(pipes [][]*pipe, dir, x, y int, constraints int, t
 				leftOk = depthFirstSearchForExit1(pipes, 3, x-1, y, ^4, tested)
 				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^4, tested)
 			}
-		} else if pip.kind.kind == "|" {
+		} else if pip.kind.connectors == 2|8 {
 			if dir == 1 {
 				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^2, tested)
 				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^2, tested)
@@ -149,7 +149,7 @@ func depthFirstSearchForExit1(pipes [][]*pipe, dir, x, y int, constraints int, t
 				}
 				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, constraints, tested)
 			}
-		} else if pip.kind.kind == "F" {
+		} else if pip.kind.connectors == 1|2 {
 			if dir == 1 {
 				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^8, tested)
 				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^0, tested)
@@ -177,7 +177,7 @@ func depthFirstSearchForExit1(pipes [][]*pipe, dir, x, y int, constraints int, t
 					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^4, tested)
 				}
 			}
-		} else if pip.kind.kind == "J" {
+		} else if pip.kind.connectors == 4|8 {
 			if dir == 1 {
 				if constraints&4 != 0 {
 					upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^2, tested)
@@ -205,7 +205,7 @@ func depthFirstSearchForExit1(pipes [][]*pipe, dir, x, y int, constraints int, t
 				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^0, tested)
 				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^1, tested)
 			}
-		} else if pip.kind.kind == "L" {
+		} else if pip.kind.connectors == 1|8 {
 			if dir == 1 {
 				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^4, tested)
 				downOk = depthFirstSearchForExit1(pipes, 2, x, y+1, ^0, tested)
@@ -233,7 +233,7 @@ func depthFirstSearchForExit1(pipes [][]*pipe, dir, x, y int, constraints int, t
 				rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^4, tested)
 				upOk = depthFirstSearchForExit1(pipes, 4, x, y-1, ^2, tested)
 			}
-		} else if pip.kind.kind == "7" {
+		} else if pip.kind.connectors == 2|4 {
 			if dir == 1 {
 				if constraints&4 != 0 {
 					rightOk = depthFirstSearchForExit1(pipes, 1, x+1, y, ^0, tested)
@@ -302,8 +302,8 @@ func main() {
 		row := make([]*pipe, 0)
 		for _, p := range pipesInRow {
 			if p == '.' {
-				// here, we handle "." as a pipe with kind ""
-				row = append(row, &pipe{kind: pipeKind{"", 0}, x: len(row), y: len(rows)})
+				// here, we handle "." as a pipe with no connectors
+				row = append(row, &pipe{kind: pipeKind{0}, x: len(row), y: len(rows)})
 				continue
 			}
 			pip := &pipe{x: len(row), y: len(rows), kind: pipeKinds[string(p)]}
