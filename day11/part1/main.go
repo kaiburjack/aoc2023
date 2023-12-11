@@ -60,12 +60,12 @@ func main() {
 
 	// compute all manhattan distances
 	// between pairs of galaxies
-	sumOfShortesPaths := 0
+	sumOfShortestPaths := 0
 	for i, gi := range galaxies {
 		for _, gj := range galaxies[:i] {
-			sumOfShortesPaths += manhattanDistance(*gi, *gj)
+			sumOfShortestPaths += manhattanDistance(*gi, *gj)
 		}
 	}
 
-	println(sumOfShortesPaths)
+	println(sumOfShortestPaths)
 }
