@@ -37,7 +37,7 @@ func lcm(a, b uint64, rest ...uint64) uint64 {
 
 func main() {
 	fileName := "input.txt"
-	file, _ := os.OpenFile(fileName, os.O_RDONLY, 0)
+	file, _ := os.Open(fileName)
 	parser, _ := participle.Build[Input]()
 	input, _ := parser.Parse(fileName, bufio.NewReader(file))
 	m := make(map[string]Row)

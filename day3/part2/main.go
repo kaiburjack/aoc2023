@@ -73,7 +73,7 @@ func (thiz *board) findGears() {
 }
 
 func main() {
-	file, _ := os.OpenFile("input.txt", os.O_RDONLY, 0)
+	file, _ := os.Open("input.txt")
 	r := bufio.NewReader(file)
 	var brd board
 	var currentLine []byte

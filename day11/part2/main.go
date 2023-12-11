@@ -12,6 +12,7 @@ type coord struct {
 }
 
 func manhattanDistance(c1, c2 coord) int64 {
+	// sadly, there is no math.Abs for int, so we have to do a bit of type conversion
 	return int64(math.Abs(float64(c1.ox-c2.ox))) + int64(math.Abs(float64(c1.y-c2.y)))
 }
 
@@ -24,7 +25,7 @@ func main() {
 	// parse map and do y-offsetting already
 	var y int64
 	var scale int64 = 1000000
-	colHadGalaxy := make([]bool, 1024) // <- just have a large enough array
+	var colHadGalaxy [1024]bool // <- just have a large enough array
 	for fileScanner.Scan() {
 		line := fileScanner.Text()
 		emptyLine := true

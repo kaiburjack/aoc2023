@@ -27,7 +27,7 @@ type Input struct {
 
 func main() {
 	fileName := "input.txt"
-	file, _ := os.OpenFile(fileName, os.O_RDONLY, 0)
+	file, _ := os.Open(fileName)
 	parser, _ := participle.Build[Input]()
 	input, _ := parser.Parse(fileName, bufio.NewReader(file))
 	var sumOfPowers int64

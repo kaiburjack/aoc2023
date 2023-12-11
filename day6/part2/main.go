@@ -29,7 +29,7 @@ func solveQuadratic(maxTime, minDistance float64) (int64, int64) {
 
 func main() {
 	fileName := "input.txt"
-	file, _ := os.OpenFile(fileName, os.O_RDONLY, 0)
+	file, _ := os.Open(fileName)
 	parser, _ := participle.Build[Input]()
 	input, _ := parser.Parse(fileName, bufio.NewReader(file))
 	timeAsFloat64, _ := strconv.ParseFloat(strings.ReplaceAll(input.Time, " ", ""), 64)
