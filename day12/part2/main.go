@@ -12,7 +12,7 @@ type cacheKey struct {
 	n [32]uint8
 }
 
-var cache = make(map[cacheKey]int64)
+var cache = make(map[cacheKey]uint64)
 
 func key(s string, numDamaged []uint8) cacheKey {
 	var n [32]uint8
@@ -20,16 +20,17 @@ func key(s string, numDamaged []uint8) cacheKey {
 	return cacheKey{s, n}
 }
 
-func matchesCount(s string, numDamaged []uint8) int64 {
-	if cached, ok := cache[key(s, numDamaged)]; ok {
-		return cached
-	}
+func matchesCount(s string, numDamaged []uint8) uint64 {
 	if len(s) == 0 && len(numDamaged) == 0 {
 		return 1
 	} else if len(s) == 0 {
 		return 0
 	}
-	var count int64
+	cacheKey := key(s, numDamaged)
+	if cached, ok := cache[cacheKey]; ok {
+		return cached
+	}
+	var count uint64
 	switch s[0] {
 	case '.':
 		count = matchesCount(s[1:], numDamaged)
@@ -46,11 +47,11 @@ func matchesCount(s string, numDamaged []uint8) int64 {
 			count = mustBeDamaged(s, numDamaged, numDamaged[0])
 		}
 	}
-	cache[key(s, numDamaged)] = count
+	cache[cacheKey] = count
 	return count
 }
 
-func mustBeDamaged(s string, numDamaged []uint8, num uint8) int64 {
+func mustBeDamaged(s string, numDamaged []uint8, num uint8) uint64 {
 	if len(s) < int(num) {
 		return 0
 	}
@@ -69,7 +70,7 @@ func main() {
 	readFile, _ := os.Open("input.txt")
 	fileScanner := bufio.NewScanner(readFile)
 	fileScanner.Split(bufio.ScanLines)
-	var matchesCountSum int64
+	var matchesCountSum uint64
 	for fileScanner.Scan() {
 		for ck := range cache {
 			delete(cache, ck)
