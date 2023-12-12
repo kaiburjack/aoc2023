@@ -14,19 +14,19 @@ type cacheKey struct {
 
 var cache = make(map[cacheKey]int64)
 
-func key(s string, numDefects []int) cacheKey {
+func key(s string, numDamaged []int) cacheKey {
 	var n [32]uint8
-	for i, v := range numDefects {
+	for i, v := range numDamaged {
 		n[i] = uint8(v)
 	}
 	return cacheKey{s, n}
 }
 
-func matchesCount(s string, numDefects []int) int64 {
-	if cached, ok := cache[key(s, numDefects)]; ok {
+func matchesCount(s string, numDamaged []int) int64 {
+	if cached, ok := cache[key(s, numDamaged)]; ok {
 		return cached
 	}
-	if len(s) == 0 && len(numDefects) == 0 {
+	if len(s) == 0 && len(numDamaged) == 0 {
 		return 1
 	} else if len(s) == 0 {
 		return 0
@@ -34,25 +34,25 @@ func matchesCount(s string, numDefects []int) int64 {
 	var count int64
 	switch s[0] {
 	case '.':
-		count = matchesCount(s[1:], numDefects)
+		count = matchesCount(s[1:], numDamaged)
 	case '?':
-		if len(numDefects) == 0 {
-			count = matchesCount(s[1:], numDefects)
+		if len(numDamaged) == 0 {
+			count = matchesCount(s[1:], numDamaged)
 		} else {
-			count = mustBeDefect(s, numDefects, numDefects[0]) + matchesCount(s[1:], numDefects)
+			count = mustBeDamaged(s, numDamaged, numDamaged[0]) + matchesCount(s[1:], numDamaged)
 		}
 	case '#':
-		if len(numDefects) == 0 {
+		if len(numDamaged) == 0 {
 			count = 0
 		} else {
-			count = mustBeDefect(s, numDefects, numDefects[0])
+			count = mustBeDamaged(s, numDamaged, numDamaged[0])
 		}
 	}
-	cache[key(s, numDefects)] = count
+	cache[key(s, numDamaged)] = count
 	return count
 }
 
-func mustBeDefect(s string, numDefects []int, num int) int64 {
+func mustBeDamaged(s string, numDamaged []int, num int) int64 {
 	if len(s) < num {
 		return 0
 	}
@@ -60,9 +60,9 @@ func mustBeDefect(s string, numDefects []int, num int) int64 {
 		return 0
 	}
 	if len(s) == num {
-		return matchesCount(s[num:], numDefects[1:])
+		return matchesCount(s[num:], numDamaged[1:])
 	} else if s[num] == '.' || s[num] == '?' {
-		return matchesCount(s[num+1:], numDefects[1:])
+		return matchesCount(s[num+1:], numDamaged[1:])
 	}
 	return 0
 }
@@ -75,9 +75,9 @@ func main() {
 	for fileScanner.Scan() {
 		splitBySpace := strings.Split(fileScanner.Text(), " ")
 		repeatedSprings := strings.Repeat("?"+splitBySpace[0], 5)[1:]
-		repeatedDefectNumbers := strings.Repeat(","+splitBySpace[1], 5)[1:]
+		repeatedDamageCounts := strings.Repeat(","+splitBySpace[1], 5)[1:]
 		var damagedCount []int
-		for _, number := range strings.Split(repeatedDefectNumbers, ",") {
+		for _, number := range strings.Split(repeatedDamageCounts, ",") {
 			n, _ := strconv.Atoi(strings.TrimSpace(number))
 			damagedCount = append(damagedCount, n)
 		}
