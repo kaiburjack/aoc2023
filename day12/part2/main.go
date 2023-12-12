@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"os"
 	"strconv"
 	"strings"
@@ -22,8 +23,8 @@ func key(s string, numDefects []int) cacheKey {
 	return cacheKey{s, n}
 }
 
-func matchesCount(s string, numDefects []int) int64 {
-	if cached, ok := cache[key(s, numDefects)]; ok {
+func matchesCount(s []byte, numDefects []int) int64 {
+	if cached, ok := cache[key(string(s), numDefects)]; ok {
 		return cached
 	}
 	if len(s) == 0 && len(numDefects) == 0 {
@@ -48,18 +49,16 @@ func matchesCount(s string, numDefects []int) int64 {
 			count = mustBeDefect(s, numDefects, numDefects[0])
 		}
 	}
-	cache[key(s, numDefects)] = count
+	cache[key(string(s), numDefects)] = count
 	return count
 }
 
-func mustBeDefect(s string, numDefects []int, num int) int64 {
+func mustBeDefect(s []byte, numDefects []int, num int) int64 {
 	if len(s) < num {
 		return 0
 	}
-	for i := 0; i < num; i++ {
-		if s[i] != '#' && s[i] != '?' {
-			return 0
-		}
+	if bytes.IndexByte(s[:num], '.') > -1 {
+		return 0
 	}
 	if len(s) == num {
 		return matchesCount(s[num:], numDefects[1:])
@@ -83,7 +82,7 @@ func main() {
 			n, _ := strconv.Atoi(strings.TrimSpace(number))
 			damagedCount = append(damagedCount, n)
 		}
-		matchesCountSum += matchesCount(repeatedSprings, damagedCount)
+		matchesCountSum += matchesCount([]byte(repeatedSprings), damagedCount)
 	}
 	println(matchesCountSum)
 }

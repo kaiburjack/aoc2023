@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"os"
 	"strconv"
 	"strings"
@@ -11,7 +12,7 @@ import (
 // and number of damaged springs by recursing over the input string
 // and accumulating the number of valid combinations that we can
 // generate.
-func matchesCount(s string, numDefects []int) int64 {
+func matchesCount(s []byte, numDefects []int) int64 {
 	if len(s) == 0 && len(numDefects) == 0 {
 		// if we have no more characters to process and no more
 		// damaged springs to find, we return "1 combination"
@@ -59,18 +60,16 @@ func matchesCount(s string, numDefects []int) int64 {
 
 // mustBeDefect is called when we know that we must generate _exactly_
 // num damaged springs to now recurse per character.
-func mustBeDefect(s string, numDefects []int, num int) int64 {
+func mustBeDefect(s []byte, numDefects []int, num int) int64 {
 	if len(s) < num {
 		// when we have less characters than we need to generate
 		// defects, return "zero combinations"
 		return 0
 	}
-	for i := 0; i < num; i++ {
-		if s[i] != '#' && s[i] != '?' {
-			// if any of the needed characters cannot be made
-			// into a damaged spring, return "zero combinations"
-			return 0
-		}
+	if bytes.IndexByte(s[:num], '.') > -1 {
+		// if any of the needed characters cannot be made
+		// into a damaged spring, return "zero combinations"
+		return 0
 	}
 	if len(s) == num {
 		// if we have exactly the number of characters we need
@@ -100,7 +99,7 @@ func main() {
 			damagedCount = append(damagedCount, n)
 		}
 		// accumulate the number of combinations for each line
-		matchesCountSum += matchesCount(splitBySpace[0], damagedCount)
+		matchesCountSum += matchesCount([]byte(splitBySpace[0]), damagedCount)
 	}
 	println(matchesCountSum)
 }
