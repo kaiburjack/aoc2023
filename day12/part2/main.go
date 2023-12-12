@@ -14,15 +14,13 @@ type cacheKey struct {
 
 var cache = make(map[cacheKey]int64)
 
-func key(s string, numDamaged []int) cacheKey {
+func key(s string, numDamaged []uint8) cacheKey {
 	var n [32]uint8
-	for i, v := range numDamaged {
-		n[i] = uint8(v)
-	}
+	copy(n[:], numDamaged)
 	return cacheKey{s, n}
 }
 
-func matchesCount(s string, numDamaged []int) int64 {
+func matchesCount(s string, numDamaged []uint8) int64 {
 	if cached, ok := cache[key(s, numDamaged)]; ok {
 		return cached
 	}
@@ -52,14 +50,14 @@ func matchesCount(s string, numDamaged []int) int64 {
 	return count
 }
 
-func mustBeDamaged(s string, numDamaged []int, num int) int64 {
-	if len(s) < num {
+func mustBeDamaged(s string, numDamaged []uint8, num uint8) int64 {
+	if len(s) < int(num) {
 		return 0
 	}
 	if strings.ContainsRune(s[:num], '.') {
 		return 0
 	}
-	if len(s) == num {
+	if len(s) == int(num) {
 		return matchesCount(s[num:], numDamaged[1:])
 	} else if s[num] == '.' || s[num] == '?' {
 		return matchesCount(s[num+1:], numDamaged[1:])
@@ -73,13 +71,16 @@ func main() {
 	fileScanner.Split(bufio.ScanLines)
 	var matchesCountSum int64
 	for fileScanner.Scan() {
+		for ck := range cache {
+			delete(cache, ck)
+		}
 		splitBySpace := strings.Split(fileScanner.Text(), " ")
 		repeatedSprings := strings.Repeat("?"+splitBySpace[0], 5)[1:]
 		repeatedDamageCounts := strings.Repeat(","+splitBySpace[1], 5)[1:]
-		var damagedCount []int
+		var damagedCount []uint8
 		for _, number := range strings.Split(repeatedDamageCounts, ",") {
 			n, _ := strconv.Atoi(strings.TrimSpace(number))
-			damagedCount = append(damagedCount, n)
+			damagedCount = append(damagedCount, uint8(n))
 		}
 		matchesCountSum += matchesCount(repeatedSprings, damagedCount)
 	}
