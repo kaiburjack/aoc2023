@@ -47,10 +47,11 @@ func main() {
 	fileScanner.Split(bufio.ScanLines)
 	var currentPattern [][]byte
 	var sum int64
-	for fileScanner.Scan() {
-		line := fileScanner.Text()
-		if line != "" {
-			currentPattern = append(currentPattern, []byte(line))
+	hasNext := true
+	for hasNext {
+		hasNext = fileScanner.Scan()
+		if hasNext && len(fileScanner.Bytes()) != 0 {
+			currentPattern = append(currentPattern, fileScanner.Bytes())
 			continue
 		}
 		transposedPattern := transpose(currentPattern)
