@@ -44,22 +44,21 @@ func findReflectionLine(pattern [][]byte) int {
 func main() {
 	readFile, _ := os.Open("example.txt")
 	fileScanner := bufio.NewScanner(readFile)
-	var currentPattern [][]byte
+	var pat [][]byte
 	var sum int64
 	hasNext := true
 	for hasNext {
 		hasNext = fileScanner.Scan()
 		if hasNext && len(fileScanner.Bytes()) != 0 {
-			currentPattern = append(currentPattern, []byte(fileScanner.Text()))
+			pat = append(pat, []byte(fileScanner.Text()))
 			continue
 		}
-		row := -1
 		col := -1
-		row = findReflectionLine(currentPattern)
+		row := findReflectionLine(pat)
 		if row == -1 {
-			col = findReflectionLine(transpose(currentPattern))
+			col = findReflectionLine(transpose(pat))
 		}
-		currentPattern = nil
+		pat = nil
 		if row > -1 {
 			sum += 100 * (int64(row) + 1)
 		} else if col > -1 {

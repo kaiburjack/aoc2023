@@ -21,7 +21,7 @@ func transpose(slice [][]byte) [][]byte {
 	return result
 }
 
-func findReflectionLine(originalRow int, pattern [][]byte) int {
+func findReflectionLine(originalIndex int, pattern [][]byte) int {
 	for y := 0; y < len(pattern)-1; y++ {
 		length := y + 1
 		if length > len(pattern)/2 {
@@ -34,7 +34,7 @@ func findReflectionLine(originalRow int, pattern [][]byte) int {
 				break
 			}
 		}
-		if found && originalRow != y {
+		if found && originalIndex != y {
 			return y
 		}
 	}
@@ -44,50 +44,49 @@ func findReflectionLine(originalRow int, pattern [][]byte) int {
 func main() {
 	readFile, _ := os.Open("input.txt")
 	fileScanner := bufio.NewScanner(readFile)
-	var currentPattern [][]byte
+	var pat [][]byte
 	var sum int64
 	hasNext := true
 	for hasNext {
 		hasNext = fileScanner.Scan()
 		if hasNext && len(fileScanner.Bytes()) != 0 {
-			currentPattern = append(currentPattern, []byte(fileScanner.Text()))
+			pat = append(pat, []byte(fileScanner.Text()))
 			continue
 		}
-		transposedPattern := transpose(currentPattern)
-		row := -1
+		tpat := transpose(pat)
+		row := findReflectionLine(-1, pat)
 		col := -1
-		row = findReflectionLine(-1, currentPattern)
 		if row == -1 {
-			col = findReflectionLine(-1, transposedPattern)
+			col = findReflectionLine(-1, tpat)
 		}
-		row, col = findDifferentReflectionLine(currentPattern, transposedPattern, row, col)
-		currentPattern = nil
+		row, col = findDifferentReflectionLine(pat, tpat, row, col)
+		pat = nil
 		sum += 100*(int64(row)+1) + int64(col) + 1
 	}
 	println(sum)
 }
 
-func findDifferentReflectionLine(currentPattern [][]byte, transposedPattern [][]byte, originalRow int, originalCol int) (int, int) {
-	for y := 0; y < len(currentPattern); y++ {
-		for x := 0; x < len(currentPattern[y]); x++ {
-			oldVal := currentPattern[y][x]
+func findDifferentReflectionLine(pat [][]byte, tpat [][]byte, originalRow int, originalCol int) (int, int) {
+	for y := 0; y < len(pat); y++ {
+		for x := 0; x < len(pat[y]); x++ {
+			oldVal := pat[y][x]
 			if oldVal == '#' {
-				currentPattern[y][x] = '.'
-				transposedPattern[x][y] = '.'
+				pat[y][x] = '.'
+				tpat[x][y] = '.'
 			} else {
-				currentPattern[y][x] = '#'
-				transposedPattern[x][y] = '#'
+				pat[y][x] = '#'
+				tpat[x][y] = '#'
 			}
-			row := findReflectionLine(originalRow, currentPattern)
+			row := findReflectionLine(originalRow, pat)
 			if row != -1 {
 				return row, -1
 			}
-			col := findReflectionLine(originalCol, transposedPattern)
+			col := findReflectionLine(originalCol, tpat)
 			if col != -1 {
 				return -1, col
 			}
-			currentPattern[y][x] = oldVal
-			transposedPattern[x][y] = oldVal
+			pat[y][x] = oldVal
+			tpat[x][y] = oldVal
 		}
 	}
 	return originalRow, originalCol
