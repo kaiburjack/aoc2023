@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"os"
 )
 
@@ -27,12 +28,10 @@ func findReflectionLine(pattern [][]byte) int {
 			length = len(pattern) - y - 1
 		}
 		found := true
-		for dy := 0; dy < length && found; dy++ {
-			for x := 0; x < len(pattern[y]); x++ {
-				if pattern[y-dy][x] != pattern[y+dy+1][x] {
-					found = false
-					break
-				}
+		for dy := 0; dy < length; dy++ {
+			if !bytes.Equal(pattern[y-dy], pattern[y+dy+1]) {
+				found = false
+				break
 			}
 		}
 		if found {
