@@ -7,8 +7,7 @@ import (
 )
 
 func transpose(slice [][]byte) [][]byte {
-	xl := len(slice[0])
-	yl := len(slice)
+	xl, yl := len(slice[0]), len(slice)
 	result := make([][]byte, xl)
 	for i := range result {
 		result[i] = make([]byte, yl)
@@ -23,12 +22,8 @@ func transpose(slice [][]byte) [][]byte {
 
 func findReflectionLine(originalIndex int, pattern [][]byte) int {
 	for y := 0; y < len(pattern)-1; y++ {
-		length := y + 1
-		if length > len(pattern)/2 {
-			length = len(pattern) - y - 1
-		}
 		found := true
-		for dy := 0; dy < length; dy++ {
+		for dy := 0; dy < min(y+1, len(pattern)-y-1); dy++ {
 			if !bytes.Equal(pattern[y-dy], pattern[y+dy+1]) {
 				found = false
 				break
@@ -71,11 +66,9 @@ func findDifferentReflectionLine(pat [][]byte, tpat [][]byte, originalRow int, o
 		for x := 0; x < len(pat[y]); x++ {
 			oldVal := pat[y][x]
 			if oldVal == '#' {
-				pat[y][x] = '.'
-				tpat[x][y] = '.'
+				pat[y][x], tpat[x][y] = '.', '.'
 			} else {
-				pat[y][x] = '#'
-				tpat[x][y] = '#'
+				pat[y][x], tpat[x][y] = '#', '#'
 			}
 			row := findReflectionLine(originalRow, pat)
 			if row != -1 {
@@ -85,8 +78,7 @@ func findDifferentReflectionLine(pat [][]byte, tpat [][]byte, originalRow int, o
 			if col != -1 {
 				return -1, col
 			}
-			pat[y][x] = oldVal
-			tpat[x][y] = oldVal
+			pat[y][x], tpat[x][y] = oldVal, oldVal
 		}
 	}
 	return originalRow, originalCol

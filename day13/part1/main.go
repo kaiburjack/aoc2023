@@ -7,8 +7,7 @@ import (
 )
 
 func transpose(slice [][]byte) [][]byte {
-	xl := len(slice[0])
-	yl := len(slice)
+	xl, yl := len(slice[0]), len(slice)
 	result := make([][]byte, xl)
 	for i := range result {
 		result[i] = make([]byte, yl)
@@ -23,12 +22,8 @@ func transpose(slice [][]byte) [][]byte {
 
 func findReflectionLine(pattern [][]byte) int {
 	for y := 0; y < len(pattern)-1; y++ {
-		length := y + 1
-		if length > len(pattern)/2 {
-			length = len(pattern) - y - 1
-		}
 		found := true
-		for dy := 0; dy < length; dy++ {
+		for dy := 0; dy < min(y+1, len(pattern)-y-1); dy++ {
 			if !bytes.Equal(pattern[y-dy], pattern[y+dy+1]) {
 				found = false
 				break
