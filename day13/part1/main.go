@@ -48,17 +48,12 @@ func main() {
 			pat = append(pat, []byte(fileScanner.Text()))
 			continue
 		}
-		col := -1
-		row := findReflectionLine(pat)
-		if row == -1 {
-			col = findReflectionLine(transpose(pat))
+		v := 100 * (findReflectionLine(pat) + 1)
+		if v == 0 {
+			v = findReflectionLine(transpose(pat)) + 1
 		}
 		pat = nil
-		if row > -1 {
-			sum += 100 * (int64(row) + 1)
-		} else if col > -1 {
-			sum += int64(col) + 1
-		}
+		sum += int64(v)
 	}
 	println(sum)
 }
