@@ -49,12 +49,9 @@ func main() {
 			continue
 		}
 		tpat := transpose(pat)
-		row := findReflectionLine(-1, pat)
-		col := -1
-		if row == -1 {
-			col = findReflectionLine(-1, tpat)
-		}
-		sum += int64(findDifferentReflectionLine(pat, tpat, row, col))
+		sum += int64(findDifferentReflectionLine(pat, tpat,
+			findReflectionLine(-1, pat),
+			findReflectionLine(-1, tpat)))
 		pat = nil
 	}
 	println(sum)
@@ -69,10 +66,9 @@ func findDifferentReflectionLine(pat [][]byte, tpat [][]byte, originalRow int, o
 			} else {
 				pat[y][x], tpat[x][y] = '#', '#'
 			}
-			if v := (findReflectionLine(originalRow, pat) + 1) * 100; v != 0 {
-				return v
-			} else if v = findReflectionLine(originalCol, tpat) + 1; v != 0 {
-				return v
+			if r, c := findReflectionLine(originalRow, pat),
+				findReflectionLine(originalCol, tpat); r != -1 || c != -1 {
+				return (r+1)*100 + c + 1
 			}
 			pat[y][x], tpat[x][y] = oldVal, oldVal
 		}
