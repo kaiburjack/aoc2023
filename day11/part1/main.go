@@ -22,12 +22,10 @@ func main() {
 	galaxies := make([]*coord, 0)
 
 	// parse map and do y-offsetting already
-	y := 0
 	var colHadGalaxy [1024]bool // <- just have a large enough array
-	for fileScanner.Scan() {
-		line := fileScanner.Text()
+	for y := 0; fileScanner.Scan(); y++ {
 		emptyRow := true
-		for x, c := range line {
+		for x, c := range fileScanner.Text() {
 			if c == '#' {
 				// found a galaxy
 				galaxies = append(galaxies, &coord{x, y, x})
@@ -41,7 +39,6 @@ func main() {
 			// offset y for later rows
 			y++
 		}
-		y++
 	}
 
 	// fix empty columns and offset items
