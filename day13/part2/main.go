@@ -60,17 +60,12 @@ func main() {
 func findDifferentReflectionLine(pat [][]byte, tpat [][]byte, originalRow int, originalCol int) int {
 	for y := 0; y < len(pat); y++ {
 		for x := 0; x < len(pat[y]); x++ {
-			oldVal := pat[y][x]
-			if oldVal == '#' {
-				pat[y][x], tpat[x][y] = '.', '.'
-			} else {
-				pat[y][x], tpat[x][y] = '#', '#'
-			}
+			pat[y][x], tpat[x][y] = 81-pat[y][x], 81-tpat[x][y]
 			if r, c := findReflectionLine(originalRow, pat),
 				findReflectionLine(originalCol, tpat); r != -1 || c != -1 {
 				return (r+1)*100 + c + 1
 			}
-			pat[y][x], tpat[x][y] = oldVal, oldVal
+			pat[y][x], tpat[x][y] = 81-pat[y][x], 81-tpat[x][y]
 		}
 	}
 	return (originalRow+1)*100 + originalCol + 1
