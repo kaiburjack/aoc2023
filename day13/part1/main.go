@@ -37,7 +37,7 @@ func findReflectionLine(pattern [][]byte) int {
 }
 
 func main() {
-	readFile, _ := os.Open("example.txt")
+	readFile, _ := os.Open("input.txt")
 	fileScanner := bufio.NewScanner(readFile)
 	var pat [][]byte
 	var sum int64

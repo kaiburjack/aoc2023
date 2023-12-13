@@ -20,7 +20,6 @@ func extrapolationsSum(numbers []int64) int64 {
 func main() {
 	readFile, _ := os.Open("input.txt")
 	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
 	var sumOfSums int64
 	numbers := make([]int64, 0)
 	for fileScanner.Scan() {

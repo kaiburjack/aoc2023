@@ -68,7 +68,6 @@ func connect(rows [][]*pipe, pip *pipe) {
 func main() {
 	readFile, _ := os.Open("input.txt")
 	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
 	rows := make([][]*pipe, 0)
 	start := &pipe{}
 

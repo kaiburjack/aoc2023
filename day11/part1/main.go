@@ -19,7 +19,6 @@ func manhattanDistance(c1, c2 coord) int {
 func main() {
 	readFile, _ := os.Open("input.txt")
 	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
 	galaxies := make([]*coord, 0)
 
 	// parse map and do y-offsetting already

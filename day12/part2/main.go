@@ -69,7 +69,6 @@ func mustBeDamaged(s string, numDamaged []uint8, num uint8) uint64 {
 func main() {
 	readFile, _ := os.Open("input.txt")
 	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
 	var matchesCountSum uint64
 	for fileScanner.Scan() {
 		for ck := range cache {

@@ -86,7 +86,6 @@ func mustBeDamaged(s string, numDamaged []int, num int) int64 {
 func main() {
 	readFile, _ := os.Open("input.txt")
 	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
 	var matchesCountSum int64
 	for fileScanner.Scan() {
 		// parse each line as an input string and a list of

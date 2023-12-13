@@ -86,7 +86,6 @@ var ORDER = []byte("AKQT98765432J")
 func main() {
 	readFile, _ := os.Open("input.txt")
 	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
 	hands := make([]Hand, 0)
 	for fileScanner.Scan() {
 		handAndBid := strings.Split(fileScanner.Text(), " ")

@@ -291,7 +291,6 @@ func depthFirstSearchForExit(pipes [][]*pipe) int {
 func main() {
 	readFile, _ := os.Open("input.txt")
 	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
 	rows := make([][]*pipe, 0)
 	start := &pipe{}
 	totalCount := 0
