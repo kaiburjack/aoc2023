@@ -16,7 +16,11 @@ func main() {
 	var total uint
 	for y := uint8(1); fileScanner.Scan(); y++ {
 		for i, c := range fileScanner.Text() {
+			// add 1 for each rock that we've already seen in this column,
+			// because with every new row that we discover in the input,
+			// the rocks that we already saw are one more row away from the bottom.
 			total += uint(numRocks[i])
+
 			switch c {
 			case '#':
 				// we have an obstacle here, remember it so that

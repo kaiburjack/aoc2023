@@ -8,8 +8,11 @@ import (
 
 // rotateRight rotates the board 90 degrees to the right.
 // This is so that we can reuse the "tilt north" function below,
-// since after rotating the board one step to the right, the previous "north"
-// is now the new "west" and we can reuse the "tilt north" function below.
+// since after rotating the board one step to the right, the previous
+// "west" (where we want to tilt next after a north-tilt) is now
+// the new "north" and we can reuse the "tilt north" function below
+// and do this (tilt, rotate) operation just four times for a single
+// round.
 // This function returns a copy of the board.
 func rotateRight(board [][]byte) [][]byte {
 	result := make([][]byte, len(board[0]))
