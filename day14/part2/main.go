@@ -76,11 +76,10 @@ func simulateOneRoundMut(board [][]byte) [][]byte {
 func eval(board [][]byte) int {
 	var numRocks [1024]int
 	var total int
-	for y := 1; y <= len(board); y++ {
-		for i, c := range board[y-1] {
+	for y := 0; y < len(board); y++ {
+		for i, c := range board[y] {
 			total += numRocks[i]
-			switch c {
-			case 'O':
+			if c == 'O' {
 				numRocks[i]++
 				total++
 			}
@@ -113,23 +112,22 @@ func main() {
 			if boardsEqual(board, seenBoard) {
 				// compute the length of the loop (current round index - index of first seen)
 				loopLen := round - seenIndex
-				// compute the jump length, which is how much farther we can increase
-				// the round index to effectively get to the same result as if we
-				// simulated that many rounds
-				jumpLength := (N - round - 1) % loopLen
-				// compute the remaining number of rounds we actually do need to simulate
-				round = N - jumpLength - 1
-				// break out, because we found the largest loop so far
-				// if we looped further here and found more equal boards, that means
-				// that we duplicated the in the "seenBoards" list and make our
-				// loop shorter by the jumpLength
-				break
+				// compute the remaining rounds that we need to simulate.
+				// Because we already simulated "round" rounds before we saw the loop,
+				// we need to simulate (N - round) additional rounds.
+				// But we can skip all loops of length 'loopLen', so we
+				// need to compute the remainder of (N - round) / loopLen.
+				remainingRounds := (N - round - 1) % loopLen
+				// simulate the remaining rounds
+				for j := 0; j < remainingRounds; j++ {
+					board = simulateOneRoundMut(board)
+				}
+				// evaluate the "north load" of the board
+				println(eval(board))
+				return
 			}
 		}
 		// remember this board for later to check for a loop
 		seenBoards = append(seenBoards, copyBoard(board))
 	}
-
-	// evaluate the "north load" of the board
-	println(eval(board))
 }
