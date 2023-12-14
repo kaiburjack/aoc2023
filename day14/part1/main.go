@@ -10,13 +10,13 @@ func main() {
 	fileScanner := bufio.NewScanner(readFile)
 	// remember the position of the next obstacle per column
 	// the "edge" of the map at the top counts as an obstacle (with value 0)
-	var nextObstacle [100]int // <- just allocate a large enough array
+	var nextObstacle [100]uint8 // <- just allocate a large enough array
 	// remember the number of rocks per column
-	var numRocks [100]int // <- just allocate a large enough array
-	var total int
-	for y := 1; fileScanner.Scan(); y++ {
+	var numRocks [100]uint8 // <- just allocate a large enough array
+	var total uint
+	for y := uint8(1); fileScanner.Scan(); y++ {
 		for i, c := range fileScanner.Text() {
-			total += numRocks[i]
+			total += uint(numRocks[i])
 			switch c {
 			case '#':
 				// we have an obstacle here, remember it so that
@@ -27,7 +27,7 @@ func main() {
 				// we saw a rock, move it north and increment the
 				// total by the number of positions moved
 				numRocks[i]++
-				total += y - nextObstacle[i]
+				total += uint(y - nextObstacle[i])
 				// increment the index of the next obstacle by one
 				// because the new rock "stacked" on top of it
 				nextObstacle[i]++

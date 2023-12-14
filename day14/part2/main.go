@@ -45,13 +45,13 @@ func copyBoard(board [][]byte) [][]byte {
 // tiltNorthMut tilts the board "north".
 // This function mutates the board.
 func tiltNorthMut(board [][]byte) [][]byte {
-	var nextObstacle [100]int
+	var nextObstacle [100]uint8
 	for y := 0; y < len(board); y++ {
 		for x := 0; x < len(board[y]); x++ {
 			c := board[y][x]
 			switch c {
 			case '#':
-				nextObstacle[x] = y + 1
+				nextObstacle[x] = uint8(y + 1)
 			case 'O':
 				board[y][x] = '.'
 				board[nextObstacle[x]][x] = 'O'
@@ -73,12 +73,12 @@ func simulateOneRoundMut(board [][]byte) [][]byte {
 }
 
 // Evaluate the "north load" of the board.
-func eval(board [][]byte) int {
-	var numRocks [100]int
-	var total int
+func eval(board [][]byte) uint {
+	var numRocks [100]uint8
+	var total uint
 	for y := 0; y < len(board); y++ {
 		for i, c := range board[y] {
-			total += numRocks[i]
+			total += uint(numRocks[i])
 			if c == 'O' {
 				numRocks[i]++
 				total++
