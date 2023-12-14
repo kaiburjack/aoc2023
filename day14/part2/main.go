@@ -104,30 +104,34 @@ func main() {
 	// we expect to (at some point) reach a loop where
 	// we see a board we've seen before
 	const N = 1000000000
-	for round := 0; round < N; round++ {
+	loopFound := false
+	for round := 0; round < N && !loopFound; round++ {
 		// actually simulate one round (north, west, south, east)
 		board = simulateOneRoundMut(board)
 		// check if we saw this resulting board before
 		for seenIndex, seenBoard := range seenBoards {
-			if boardsEqual(board, seenBoard) {
-				// compute the length of the loop (current round index - index of first seen)
-				loopLen := round - seenIndex
-				// compute the remaining rounds that we need to simulate.
-				// Because we already simulated "round" rounds before we saw the loop,
-				// we need to simulate (N - round) additional rounds.
-				// But we can skip all loops of length 'loopLen', so we
-				// need to compute the remainder of (N - round) / loopLen.
-				remainingRounds := (N - round - 1) % loopLen
-				// simulate the remaining rounds
-				for j := 0; j < remainingRounds; j++ {
-					board = simulateOneRoundMut(board)
-				}
-				// evaluate the "north load" of the board
-				println(eval(board))
-				return
+			if !boardsEqual(board, seenBoard) {
+				continue
 			}
+			// compute the length of the loop (current round index - index of first seen)
+			loopLen := round - seenIndex
+			// compute the remaining rounds that we need to simulate.
+			// Because we already simulated "round" rounds before we saw the loop,
+			// we need to simulate (N - round) additional rounds.
+			// But we can skip all loops of length 'loopLen', so we
+			// need to compute the remainder of (N - round) / loopLen.
+			remainingRounds := (N - round - 1) % loopLen
+			// simulate the remaining rounds
+			for j := 0; j < remainingRounds; j++ {
+				board = simulateOneRoundMut(board)
+			}
+			loopFound = true
+			break
 		}
 		// remember this board for later to check for a loop
 		seenBoards = append(seenBoards, copyBoard(board))
 	}
+
+	// evaluate the "north load" of the board
+	println(eval(board))
 }
