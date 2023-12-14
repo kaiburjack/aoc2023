@@ -8,21 +8,33 @@ import (
 func main() {
 	readFile, _ := os.Open("input.txt")
 	fileScanner := bufio.NewScanner(readFile)
-	var nextObstacle [1024]int
-	var numRocks [1024]int
+	// remember the position of the next obstacle per column
+	// the "edge" of the map at the top counts as an obstacle (with value 0)
+	var nextObstacle [1024]int // <- just allocate a large enough array
+	// remember the number of rocks per column
+	var numRocks [1024]int // <- just allocate a large enough array
 	var total int
 	for y := 1; fileScanner.Scan(); y++ {
 		for i, c := range fileScanner.Text() {
 			total += numRocks[i]
 			switch c {
 			case '#':
+				// we have an obstacle here, remember it so that
+				// we know how far a rock can travel north once we
+				// see the next rock in this column
 				nextObstacle[i] = y
 			case 'O':
+				// we saw a rock, move it north and increment the
+				// total by the number of positions moved
 				numRocks[i]++
 				total += y - nextObstacle[i]
+				// increment the index of the next obstacle by one
+				// because the new rock "stacked" on top of it
 				nextObstacle[i]++
 			}
 		}
 	}
+
+	// print the result
 	println(total)
 }
