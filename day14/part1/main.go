@@ -10,9 +10,9 @@ func main() {
 	fileScanner := bufio.NewScanner(readFile)
 	// remember the position of the next obstacle per column
 	// the "edge" of the map at the top counts as an obstacle (with value 0)
-	var nextObstacle [1024]int // <- just allocate a large enough array
+	var nextObstacle [100]int // <- just allocate a large enough array
 	// remember the number of rocks per column
-	var numRocks [1024]int // <- just allocate a large enough array
+	var numRocks [100]int // <- just allocate a large enough array
 	var total int
 	for y := 1; fileScanner.Scan(); y++ {
 		for i, c := range fileScanner.Text() {
