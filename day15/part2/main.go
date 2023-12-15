@@ -55,13 +55,11 @@ func main() {
 			state = 1
 		} else if b == '-' {
 			state = 2
-		} else {
-			if state == 0 {
-				h = (h + b) * 17
-				label += string(b)
-			} else if state == 1 {
-				focalLength = focalLength*10 + int(b-'0')
-			}
+		} else if state == 0 {
+			h = (h + b) * 17
+			label += string(b)
+		} else if state == 1 {
+			focalLength = focalLength*10 + int(b-'0')
 		}
 	}
 
