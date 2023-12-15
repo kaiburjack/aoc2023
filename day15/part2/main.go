@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"io"
 	"os"
+	"slices"
 )
 
 type lens struct {
@@ -12,22 +13,19 @@ type lens struct {
 }
 
 func removeLens(boxes [][]lens, h uint8, label string) {
-	for i, l := range boxes[h] {
-		if l.label == label {
-			boxes[h] = append(boxes[h][:i], boxes[h][i+1:]...)
-			break
-		}
-	}
+	boxes[h] = slices.DeleteFunc(boxes[h], func(l lens) bool {
+		return l.label == label
+	})
 }
 
-func putLens(boxes [][]lens, h uint8, lens lens) {
-	for i, l := range boxes[h] {
-		if l.label == lens.label {
-			boxes[h][i] = lens
-			return
-		}
+func putLens(boxes [][]lens, h uint8, v lens) {
+	if i := slices.IndexFunc(boxes[h], func(e lens) bool {
+		return v.label == e.label
+	}); i != -1 {
+		boxes[h][i] = v
+	} else {
+		boxes[h] = append(boxes[h], v)
 	}
-	boxes[h] = append(boxes[h], lens)
 }
 
 func main() {
