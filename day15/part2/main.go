@@ -35,16 +35,16 @@ func main() {
 	r := bufio.NewReader(file)
 	var h uint8
 	var state, focalLength int
-	var boxes = make([][]lens, 256)
+	var boxes [256][]lens
 	var label string
 
 	for {
 		b, err := r.ReadByte()
 		if b == ',' || err == io.EOF {
 			if state == 1 {
-				putLens(boxes, h, lens{focalLength, label})
+				putLens(boxes[:], h, lens{focalLength, label})
 			} else if state == 2 {
-				removeLens(boxes, h, label)
+				removeLens(boxes[:], h, label)
 			}
 			label = ""
 			state, h, focalLength = 0, 0, 0
