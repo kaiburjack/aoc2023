@@ -11,7 +11,7 @@ type lens struct {
 	label       string
 }
 
-func remove(boxes [][]lens, h uint8, label string) {
+func removeLens(boxes [][]lens, h uint8, label string) {
 	for i, l := range boxes[h] {
 		if l.label == label {
 			boxes[h] = append(boxes[h][:i], boxes[h][i+1:]...)
@@ -21,17 +21,13 @@ func remove(boxes [][]lens, h uint8, label string) {
 }
 
 func putLens(boxes [][]lens, h uint8, lens lens) {
-	found := false
 	for i, l := range boxes[h] {
 		if l.label == lens.label {
 			boxes[h][i] = lens
-			found = true
-			break
+			return
 		}
 	}
-	if !found {
-		boxes[h] = append(boxes[h], lens)
-	}
+	boxes[h] = append(boxes[h], lens)
 }
 
 func main() {
@@ -48,7 +44,7 @@ func main() {
 			if state == 1 {
 				putLens(boxes, h, lens{focalLength, label})
 			} else if state == 2 {
-				remove(boxes, h, label)
+				removeLens(boxes, h, label)
 			}
 			label = ""
 			state, h, focalLength = 0, 0, 0
