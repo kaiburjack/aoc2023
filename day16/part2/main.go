@@ -24,8 +24,7 @@ func zero(touched [][]uint8) {
 }
 func simulate(grid [][]uint8, x, y, dx, dy int, touched [][]uint8) int {
 	zero(touched)
-	beamHeads := make([]*beamHead, 0)
-	beamHeads = append(beamHeads, &beamHead{x, y, dx, dy})
+	beamHeads := []*beamHead{{x, y, dx, dy}}
 	numTouched := 0
 	for changed := true; changed; {
 		changed = false

@@ -16,8 +16,7 @@ func bitmask(v int) uint8 {
 	return uint8((v + 3) >> 1)
 }
 func simulate(grid [][]uint8, x, y, dx, dy int, touched [][]uint8) int {
-	beamHeads := make([]*beamHead, 0)
-	beamHeads = append(beamHeads, &beamHead{x, y, dx, dy})
+	beamHeads := []*beamHead{{x, y, dx, dy}}
 	numTouched := 0
 	for changed := true; changed; {
 		changed = false
