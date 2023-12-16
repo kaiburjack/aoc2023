@@ -15,15 +15,8 @@ func bitmask(v int) uint8 {
 	}
 	return uint8((v + 3) >> 1)
 }
-func zero(touched [][]uint8) {
-	for y := 0; y < len(touched); y++ {
-		for x := 0; x < len(touched[0]); x++ {
-			touched[y][x] = 0
-		}
-	}
-}
-func simulate(grid [][]uint8, x, y, dx, dy int, touched [][]uint8) int {
-	zero(touched)
+func simulate(grid []uint8, w, x, y, dx, dy int) int {
+	touched := make([]uint8, len(grid))
 	beamHeads := []*beamHead{{x, y, dx, dy}}
 	numTouched := 0
 	for changed := true; changed; {
@@ -32,18 +25,18 @@ func simulate(grid [][]uint8, x, y, dx, dy int, touched [][]uint8) int {
 			bh := beamHeads[i]
 			bh.x += bh.dx
 			bh.y += bh.dy
-			touchIdx := bitmask(bh.dx) | bitmask(bh.dy)<<2
-			if bh.x < 0 || bh.x >= len(grid[0]) || bh.y < 0 || bh.y >= len(grid) || touched[bh.y][bh.x]&touchIdx == touchIdx {
+			dirMask := bitmask(bh.dx) | bitmask(bh.dy)<<2
+			if bh.x < 0 || bh.x >= w || bh.y < 0 || bh.y >= len(grid)/w || touched[w*bh.y+bh.x]&dirMask == dirMask {
 				beamHeads = append(beamHeads[:i], beamHeads[i+1:]...)
 				i--
 				continue
 			}
-			if touched[bh.y][bh.x] == 0 {
+			if touched[w*bh.y+bh.x] == 0 {
 				numTouched++
 			}
-			touched[bh.y][bh.x] |= touchIdx
+			touched[w*bh.y+bh.x] |= dirMask
 			changed = true
-			switch grid[bh.y][bh.x] {
+			switch grid[w*bh.y+bh.x] {
 			case '/':
 				bh.dx, bh.dy = -bh.dy, -bh.dx
 			case '\\':
@@ -67,27 +60,22 @@ func simulate(grid [][]uint8, x, y, dx, dy int, touched [][]uint8) int {
 func main() {
 	file, _ := os.Open("input.txt")
 	fileScanner := bufio.NewScanner(file)
-	grid := make([][]uint8, 0)
-	touched := make([][]uint8, 0)
-
+	var grid []uint8
+	h := 0
 	for fileScanner.Scan() {
 		line := fileScanner.Text()
-		row := make([]uint8, 0)
-		trow := make([]uint8, 0)
 		for _, c := range line {
-			row = append(row, uint8(c))
-			trow = append(trow, 0)
+			grid = append(grid, uint8(c))
 		}
-		grid = append(grid, row)
-		touched = append(touched, trow)
+		h++
 	}
-
+	w := len(grid) / h
 	maxEnergized := 0
-	for y := 0; y < len(grid); y++ {
-		maxEnergized = max(max(maxEnergized, simulate(grid, -1, y, 1, 0, touched)), simulate(grid, len(grid[0]), y, -1, 0, touched))
+	for y := 0; y < len(grid)/w; y++ {
+		maxEnergized = max(max(maxEnergized, simulate(grid, w, -1, y, 1, 0)), simulate(grid, w, w, y, -1, 0))
 	}
-	for x := 0; x < len(grid[0]); x++ {
-		maxEnergized = max(max(maxEnergized, simulate(grid, x, -1, 0, 1, touched)), simulate(grid, x, len(grid[0]), 0, -1, touched))
+	for x := 0; x < w; x++ {
+		maxEnergized = max(max(maxEnergized, simulate(grid, w, x, -1, 0, 1)), simulate(grid, w, x, w, 0, -1))
 	}
 	println(maxEnergized)
 }
