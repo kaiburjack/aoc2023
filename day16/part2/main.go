@@ -9,12 +9,6 @@ type beamHead struct {
 	x, y, dx, dy int
 }
 
-func bitmask(v int) uint8 {
-	if v == 0 {
-		return 0
-	}
-	return uint8((v + 3) >> 1)
-}
 func simulate(grid []uint8, w, x, y, dx, dy int) int {
 	touched := make([]uint8, len(grid))
 	beamHeads := []*beamHead{{x, y, dx, dy}}
@@ -25,7 +19,7 @@ func simulate(grid []uint8, w, x, y, dx, dy int) int {
 			bh := beamHeads[i]
 			bh.x += bh.dx
 			bh.y += bh.dy
-			dirMask := bitmask(bh.dx) | bitmask(bh.dy)<<2
+			dirMask := uint8((bh.dx+3)%3 | (bh.dy+3)%3<<2)
 			if bh.x < 0 || bh.x >= w || bh.y < 0 || bh.y >= len(grid)/w || touched[w*bh.y+bh.x]&dirMask == dirMask {
 				beamHeads = append(beamHeads[:i], beamHeads[i+1:]...)
 				i--
