@@ -73,7 +73,7 @@ func main() {
 
 	// parse input
 	for fileScanner.Scan() {
-		pipesInRow := fileScanner.Text()
+		pipesInRow := fileScanner.Bytes()
 		row := make([]*pipe, 0)
 		for _, p := range pipesInRow {
 			if p == '.' {

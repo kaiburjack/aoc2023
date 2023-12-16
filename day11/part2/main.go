@@ -26,7 +26,7 @@ func main() {
 	var colHadGalaxy [1024]bool // <- just have a large enough array
 	for y := int64(0); fileScanner.Scan(); y++ {
 		emptyLine := true
-		for x, c := range fileScanner.Text() {
+		for x, c := range fileScanner.Bytes() {
 			if c == '#' {
 				// found a galaxy
 				galaxies = append(galaxies, &coord{int64(x), y, int64(x)})
