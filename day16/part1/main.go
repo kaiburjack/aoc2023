@@ -53,14 +53,11 @@ func simulate(grid []uint8, w, x, y, dx, dy int) int {
 
 func main() {
 	file, _ := os.Open("input.txt")
-	fileScanner := bufio.NewScanner(file)
+	r := bufio.NewScanner(file)
 	var grid []uint8
 	h := 0
-	for fileScanner.Scan() {
-		line := fileScanner.Text()
-		for _, c := range line {
-			grid = append(grid, uint8(c))
-		}
+	for r.Scan() {
+		grid = append(grid, r.Bytes()...)
 		h++
 	}
 	println(simulate(grid, len(grid)/h, -1, 0, 1, 0))
