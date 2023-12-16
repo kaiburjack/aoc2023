@@ -17,8 +17,7 @@ func simulate(grid []uint8, w, x, y, dx, dy int) int {
 		changed = false
 		for i := 0; i < len(beamHeads); i++ {
 			bh := beamHeads[i]
-			bh.x += bh.dx
-			bh.y += bh.dy
+			bh.x, bh.y = bh.x+bh.dx, bh.y+bh.dy
 			dirMask, idx, shift := uint8((bh.dx+3)%3|(bh.dy+3)%3<<2), (w*bh.y+bh.x)>>1, (bh.x+bh.y)&1<<2
 			if bh.x < 0 || bh.x >= w || bh.y < 0 || bh.y >= len(grid)/w || (touched[idx]>>shift)&dirMask == dirMask {
 				beamHeads = append(beamHeads[:i], beamHeads[i+1:]...)
