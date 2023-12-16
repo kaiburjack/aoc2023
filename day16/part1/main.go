@@ -10,7 +10,7 @@ type beamHead struct {
 }
 
 func simulate(grid []uint8, w, x, y, dx, dy int) int {
-	touched := make([]uint8, len(grid))
+	touched := make([]uint8, len(grid)>>1)
 	beamHeads := []*beamHead{{x, y, dx, dy}}
 	numTouched := 0
 	for changed := true; changed; {
@@ -19,16 +19,16 @@ func simulate(grid []uint8, w, x, y, dx, dy int) int {
 			bh := beamHeads[i]
 			bh.x += bh.dx
 			bh.y += bh.dy
-			dirMask := uint8((bh.dx+3)%3 | (bh.dy+3)%3<<2)
-			if bh.x < 0 || bh.x >= w || bh.y < 0 || bh.y >= len(grid)/w || touched[w*bh.y+bh.x]&dirMask == dirMask {
+			dirMask, idx, shift := uint8((bh.dx+3)%3|(bh.dy+3)%3<<2), (w*bh.y+bh.x)>>1, (bh.x+bh.y)&1<<2
+			if bh.x < 0 || bh.x >= w || bh.y < 0 || bh.y >= len(grid)/w || (touched[idx]>>shift)&dirMask == dirMask {
 				beamHeads = append(beamHeads[:i], beamHeads[i+1:]...)
 				i--
 				continue
 			}
-			if touched[w*bh.y+bh.x] == 0 {
+			if touched[idx]>>shift&0xF == 0 {
 				numTouched++
 			}
-			touched[w*bh.y+bh.x] |= dirMask
+			touched[idx] |= dirMask << shift
 			changed = true
 			switch grid[w*bh.y+bh.x] {
 			case '/':
