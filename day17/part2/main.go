@@ -58,49 +58,49 @@ func main() {
 	var q priorityQueue
 	heap.Push(&q, pathVertex{})
 	var visited = make(map[visitedVertex]struct{})
-	var current pathVertex
+	var c pathVertex
 	const MIN, MAX = 4, 10
 	// we need to visit some more nodes
 	for len(q) > 0 {
-		current = heap.Pop(&q).(pathVertex)
-		// check if current vertex is the end and we reached it with the minimum amount of steps in the same direction
-		if current.x == len(grid[0])-1 && current.y == len(grid)-1 && (math.Abs(float64(current.dx)) >= MIN || math.Abs(float64(current.dy)) >= MIN) {
+		c = heap.Pop(&q).(pathVertex)
+		// check if c vertex is the end and we reached it with the minimum amount of steps in the same direction
+		if c.x == len(grid[0])-1 && c.y == len(grid)-1 && (math.Abs(float64(c.dx)) >= MIN || math.Abs(float64(c.dy)) >= MIN) {
 			break
 		}
 
 		// check if we can go in any direction
-		if current.x > 0 && (current.dx == 0 && current.dy == 0 || current.dx < 0 || math.Abs(float64(current.dy)) >= MIN) && current.dx > -MAX {
-			v := visitedVertex{current.x - 1, current.y, current.dx - 1, 0}
+		if c.x > 0 && (c.dx == 0 && c.dy == 0 || c.dx < 0 || math.Abs(float64(c.dy)) >= MIN) && c.dx > -MAX {
+			v := visitedVertex{c.x - 1, c.y, c.dx - 1, 0}
 			if _, ok := visited[v]; !ok {
-				nextCost := current.d + grid[current.y][current.x-1]
+				nextCost := c.d + grid[c.y][c.x-1]
 				visited[v] = struct{}{}
-				heap.Push(&q, pathVertex{nextCost, current.x - 1, current.y, current.dx - 1, 0})
+				heap.Push(&q, pathVertex{nextCost, c.x - 1, c.y, c.dx - 1, 0})
 			}
 		}
-		if current.x < len(grid[0])-1 && (current.dx == 0 && current.dy == 0 || current.dx > 0 || math.Abs(float64(current.dy)) >= MIN) && current.dx < MAX {
-			v := visitedVertex{current.x + 1, current.y, current.dx + 1, 0}
+		if c.x < len(grid[0])-1 && (c.dx == 0 && c.dy == 0 || c.dx > 0 || math.Abs(float64(c.dy)) >= MIN) && c.dx < MAX {
+			v := visitedVertex{c.x + 1, c.y, c.dx + 1, 0}
 			if _, ok := visited[v]; !ok {
-				nextCost := current.d + grid[current.y][current.x+1]
+				nextCost := c.d + grid[c.y][c.x+1]
 				visited[v] = struct{}{}
-				heap.Push(&q, pathVertex{nextCost, current.x + 1, current.y, current.dx + 1, 0})
+				heap.Push(&q, pathVertex{nextCost, c.x + 1, c.y, c.dx + 1, 0})
 			}
 		}
-		if current.y > 0 && (current.dx == 0 && current.dy == 0 || current.dy < 0 || math.Abs(float64(current.dx)) >= MIN) && current.dy > -MAX {
-			v := visitedVertex{current.x, current.y - 1, 0, current.dy - 1}
+		if c.y > 0 && (c.dx == 0 && c.dy == 0 || c.dy < 0 || math.Abs(float64(c.dx)) >= MIN) && c.dy > -MAX {
+			v := visitedVertex{c.x, c.y - 1, 0, c.dy - 1}
 			if _, ok := visited[v]; !ok {
-				nextCost := current.d + grid[current.y-1][current.x]
+				nextCost := c.d + grid[c.y-1][c.x]
 				visited[v] = struct{}{}
-				heap.Push(&q, pathVertex{nextCost, current.x, current.y - 1, 0, current.dy - 1})
+				heap.Push(&q, pathVertex{nextCost, c.x, c.y - 1, 0, c.dy - 1})
 			}
 		}
-		if current.y < len(grid)-1 && (current.dx == 0 && current.dy == 0 || current.dy > 0 || math.Abs(float64(current.dx)) >= MIN) && current.dy < MAX {
-			v := visitedVertex{current.x, current.y + 1, 0, current.dy + 1}
+		if c.y < len(grid)-1 && (c.dx == 0 && c.dy == 0 || c.dy > 0 || math.Abs(float64(c.dx)) >= MIN) && c.dy < MAX {
+			v := visitedVertex{c.x, c.y + 1, 0, c.dy + 1}
 			if _, ok := visited[v]; !ok {
-				nextCost := current.d + grid[current.y+1][current.x]
+				nextCost := c.d + grid[c.y+1][c.x]
 				visited[v] = struct{}{}
-				heap.Push(&q, pathVertex{nextCost, current.x, current.y + 1, 0, current.dy + 1})
+				heap.Push(&q, pathVertex{nextCost, c.x, c.y + 1, 0, c.dy + 1})
 			}
 		}
 	}
-	println(current.d)
+	println(c.d)
 }
