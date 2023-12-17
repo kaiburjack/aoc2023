@@ -76,33 +76,29 @@ func main() {
 		if c.x > 0 && (c.dx == 0 && c.dy == 0 || c.dx < 0 || math.Abs(float64(c.dy)) >= MIN) && c.dx > -MAX {
 			v := visitedVertex{c.x - 1, c.y, c.dx - 1, 0}
 			if _, ok := visited[v]; !ok {
-				nextCost := c.d + uint(grid[c.y][c.x-1])
 				visited[v] = struct{}{}
-				heap.Push(&q, &pathVertex{nextCost, c.x - 1, c.y, c.dx - 1, 0})
+				heap.Push(&q, &pathVertex{c.d + uint(grid[c.y][c.x-1]), c.x - 1, c.y, c.dx - 1, 0})
 			}
 		}
 		if c.x < w-1 && (c.dx == 0 && c.dy == 0 || c.dx > 0 || math.Abs(float64(c.dy)) >= MIN) && c.dx < MAX {
 			v := visitedVertex{c.x + 1, c.y, c.dx + 1, 0}
 			if _, ok := visited[v]; !ok {
-				nextCost := c.d + uint(grid[c.y][c.x+1])
 				visited[v] = struct{}{}
-				heap.Push(&q, &pathVertex{nextCost, c.x + 1, c.y, c.dx + 1, 0})
+				heap.Push(&q, &pathVertex{c.d + uint(grid[c.y][c.x+1]), c.x + 1, c.y, c.dx + 1, 0})
 			}
 		}
 		if c.y > 0 && (c.dx == 0 && c.dy == 0 || c.dy < 0 || math.Abs(float64(c.dx)) >= MIN) && c.dy > -MAX {
 			v := visitedVertex{c.x, c.y - 1, 0, c.dy - 1}
 			if _, ok := visited[v]; !ok {
-				nextCost := c.d + uint(grid[c.y-1][c.x])
 				visited[v] = struct{}{}
-				heap.Push(&q, &pathVertex{nextCost, c.x, c.y - 1, 0, c.dy - 1})
+				heap.Push(&q, &pathVertex{c.d + uint(grid[c.y-1][c.x]), c.x, c.y - 1, 0, c.dy - 1})
 			}
 		}
 		if c.y < h-1 && (c.dx == 0 && c.dy == 0 || c.dy > 0 || math.Abs(float64(c.dx)) >= MIN) && c.dy < MAX {
 			v := visitedVertex{c.x, c.y + 1, 0, c.dy + 1}
 			if _, ok := visited[v]; !ok {
-				nextCost := c.d + uint(grid[c.y+1][c.x])
 				visited[v] = struct{}{}
-				heap.Push(&q, &pathVertex{nextCost, c.x, c.y + 1, 0, c.dy + 1})
+				heap.Push(&q, &pathVertex{c.d + uint(grid[c.y+1][c.x]), c.x, c.y + 1, 0, c.dy + 1})
 			}
 		}
 	}
