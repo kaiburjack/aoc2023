@@ -29,18 +29,17 @@ func (v *priorityQueue) Pop() interface{} {
 	return x
 }
 
-// vertices that we follow via the priority queue and which form the path
-type pathVertex struct {
-	d      uint
-	x, y   uint8
-	dx, dy int8
-}
-
 // vertices that we mark as already visited. These are NOT just the vertices of the grid,
 // so don't _just_ depend on the position in the grid, but also on the direction we came from.
 type visitedVertex struct {
 	x, y   uint8
 	dx, dy int8
+}
+
+// vertices that we follow via the priority queue and which form the path
+type pathVertex struct {
+	visitedVertex
+	d uint
 }
 
 func main() {
@@ -76,28 +75,28 @@ func main() {
 			v := visitedVertex{c.x - 1, c.y, c.dx - 1, 0}
 			if _, ok := visited[v]; !ok {
 				visited[v] = struct{}{}
-				heap.Push(&q, &pathVertex{c.d + uint(grid[c.y][c.x-1]), c.x - 1, c.y, c.dx - 1, 0})
+				heap.Push(&q, &pathVertex{visitedVertex{c.x - 1, c.y, c.dx - 1, 0}, c.d + uint(grid[c.y][c.x-1])})
 			}
 		}
 		if c.x < w-1 && c.dx >= 0 && c.dx < MAX {
 			v := visitedVertex{c.x + 1, c.y, c.dx + 1, 0}
 			if _, ok := visited[v]; !ok {
 				visited[v] = struct{}{}
-				heap.Push(&q, &pathVertex{c.d + uint(grid[c.y][c.x+1]), c.x + 1, c.y, c.dx + 1, 0})
+				heap.Push(&q, &pathVertex{visitedVertex{c.x + 1, c.y, c.dx + 1, 0}, c.d + uint(grid[c.y][c.x+1])})
 			}
 		}
 		if c.y > 0 && c.dy <= 0 && c.dy > -MAX {
 			v := visitedVertex{c.x, c.y - 1, 0, c.dy - 1}
 			if _, ok := visited[v]; !ok {
 				visited[v] = struct{}{}
-				heap.Push(&q, &pathVertex{c.d + uint(grid[c.y-1][c.x]), c.x, c.y - 1, 0, c.dy - 1})
+				heap.Push(&q, &pathVertex{visitedVertex{c.x, c.y - 1, 0, c.dy - 1}, c.d + uint(grid[c.y-1][c.x])})
 			}
 		}
 		if c.y < h-1 && c.dy >= 0 && c.dy < MAX {
 			v := visitedVertex{c.x, c.y + 1, 0, c.dy + 1}
 			if _, ok := visited[v]; !ok {
 				visited[v] = struct{}{}
-				heap.Push(&q, &pathVertex{c.d + uint(grid[c.y+1][c.x]), c.x, c.y + 1, 0, c.dy + 1})
+				heap.Push(&q, &pathVertex{visitedVertex{c.x, c.y + 1, 0, c.dy + 1}, c.d + uint(grid[c.y+1][c.x])})
 			}
 		}
 	}
