@@ -7,29 +7,20 @@ import (
 	"strings"
 )
 
-func areaUsingShoelaceFormula(vertices [][]int64) int64 {
-	var area int64
-	for i := 0; i < len(vertices); i++ {
-		v0, v1 := vertices[i], vertices[(i+1)%len(vertices)]
-		area += (v0[1] + v1[1]) * (v0[0] - v1[0])
-	}
-	return area / 2
-}
-
 func main() {
 	file, _ := os.Open("input.txt")
 	r := bufio.NewScanner(file)
-	var vertices [][]int64
-	var x, y, trenchArea int64
+	var x, y, lastX, lastY, trenchArea, polygonArea2 int64
 	dirToIndex := map[string]int{"R": 0, "D": 1, "L": 2, "U": 3}
 	dx, dy := []int64{1, 0, -1, 0}, []int64{0, 1, 0, -1}
 	for r.Scan() {
+		lastX, lastY = x, y
 		s := strings.Split(r.Text(), " ")
 		steps, _ := strconv.ParseInt(s[1], 10, 64)
 		x += steps * dx[dirToIndex[s[0]]]
 		y += steps * dy[dirToIndex[s[0]]]
 		trenchArea += steps
-		vertices = append(vertices, []int64{x, y})
+		polygonArea2 += (lastY + y) * (lastX - x)
 	}
-	println(areaUsingShoelaceFormula(vertices) + trenchArea/2 + 1)
+	println((polygonArea2+trenchArea)/2 + 1)
 }
