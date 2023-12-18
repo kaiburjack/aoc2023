@@ -16,8 +16,8 @@ func main() {
 		lastX, lastY = x, y
 		hex := strings.Trim(strings.Split(r.Text(), " ")[2], "(#)")
 		steps, _ := strconv.ParseInt(hex[:5], 16, 64)
-		x += steps * dx[(hex[5]-'0')]
-		y += steps * dy[(hex[5]-'0')]
+		x += steps * dx[hex[5]-'0']
+		y += steps * dy[hex[5]-'0']
 		trenchArea += steps
 		polygonArea2 += (lastY + y) * (lastX - x)
 	}
