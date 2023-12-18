@@ -20,7 +20,7 @@ func main() {
 	file, _ := os.Open("input.txt")
 	r := bufio.NewScanner(file)
 	var vertices [][]int64
-	var x, y, area int64
+	var x, y, trenchArea int64
 	dirToIndex := map[string]int{"R": 0, "D": 1, "L": 2, "U": 3}
 	dx, dy := []int64{1, 0, -1, 0}, []int64{0, 1, 0, -1}
 	for r.Scan() {
@@ -28,8 +28,8 @@ func main() {
 		steps, _ := strconv.ParseInt(s[1], 10, 64)
 		x += steps * dx[dirToIndex[s[0]]]
 		y += steps * dy[dirToIndex[s[0]]]
-		area += steps
+		trenchArea += steps
 		vertices = append(vertices, []int64{x, y})
 	}
-	println(areaUsingShoelaceFormula(vertices) + area/2 + 1)
+	println(areaUsingShoelaceFormula(vertices) + trenchArea/2 + 1)
 }
