@@ -17,15 +17,8 @@ type Rule struct {
 	Num  int    `parser:"@Int?"`
 	Dest string `parser:"(':' @Ident)?"`
 }
-type Part struct {
-	X int `parser:"'{' 'x' '=' @Int ','"`
-	M int `parser:"'m' '=' @Int ','"`
-	A int `parser:"'a' '=' @Int ','"`
-	S int `parser:"'s' '=' @Int '}'"`
-}
 type Input struct {
 	Workflows []Workflow `parser:"@@+"`
-	Parts     []Part     `parser:"@@+"`
 }
 
 func workflowByName(ws []Workflow, name string) Workflow {
