@@ -28,12 +28,8 @@ type Input struct {
 }
 
 var compareFuncs = map[string]func(int, int) bool{
-	"<": func(a int, b int) bool {
-		return a < b
-	},
-	">": func(a int, b int) bool {
-		return a > b
-	},
+	"<": func(a int, b int) bool { return a < b },
+	">": func(a int, b int) bool { return a > b },
 }
 
 func isAccepted(c2v map[string]int, w Workflow, n2w map[string]Workflow) bool {
