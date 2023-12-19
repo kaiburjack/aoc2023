@@ -21,20 +21,18 @@ type Input struct {
 	Workflows []Workflow `parser:"@@+"`
 }
 
+var cat2idx = map[string]int{"x": 0, "m": 1, "a": 2, "s": 3}
+
 func workflowByName(ws []Workflow, name string) Workflow {
 	return ws[slices.IndexFunc(ws, func(w Workflow) bool {
 		return w.Name == name
 	})]
 }
-
-var cat2idx = map[string]int{"x": 0, "m": 1, "a": 2, "s": 3}
-
 func combinations(min, max []int) int64 {
 	return int64((max[0]-min[0])+1) * int64((max[1]-min[1])+1) * int64((max[2]-min[2])+1) * int64((max[3]-min[3])+1)
 }
-
 func validCombinations(min, max []int, w Workflow, ws []Workflow) int64 {
-	sum := int64(0)
+	var sum int64
 	for _, r := range w.Rules {
 		if r.Op == "" {
 			if r.Cat == "A" {
