@@ -20,31 +20,25 @@ type Input struct {
 	Workflows []Workflow `parser:"@@+"`
 }
 
-var cat2idx = map[string]int{"x": 0, "m": 1, "a": 2, "s": 3}
+var c2i = map[string]int{"x": 0, "m": 1, "a": 2, "s": 3}
 
-func sumUp(min []int, max []int, cat string, n2w map[string]Workflow) int64 {
-	if cat == "A" {
-		return int64((max[0]-min[0])+1) * int64((max[1]-min[1])+1) * int64((max[2]-min[2])+1) * int64((max[3]-min[3])+1)
-	} else if cat != "R" {
-		return validCombinations(min, max, n2w[cat], n2w)
-	}
-	return 0
-}
 func validCombinations(min, max []int, w Workflow, n2w map[string]Workflow) int64 {
 	var sum int64
 	for _, r := range w.Rules {
-		if r.Op == "" {
-			return sum + sumUp(min, max, r.Cat, n2w)
-		}
-		ci := cat2idx[r.Cat]
 		mins := []int{min[0], min[1], min[2], min[3]}
 		maxs := []int{max[0], max[1], max[2], max[3]}
 		if r.Op == "<" {
-			maxs[ci], min[ci] = r.Num-1, r.Num
+			maxs[c2i[r.Cat]], min[c2i[r.Cat]] = r.Num-1, r.Num
 		} else if r.Op == ">" {
-			mins[ci], max[ci] = r.Num+1, r.Num
+			mins[c2i[r.Cat]], max[c2i[r.Cat]] = r.Num+1, r.Num
+		} else {
+			r.Dest = r.Cat
 		}
-		sum += sumUp(mins, maxs, r.Dest, n2w)
+		if r.Dest == "A" {
+			sum += int64((maxs[0]-mins[0])+1) * int64((maxs[1]-mins[1])+1) * int64((maxs[2]-mins[2])+1) * int64((maxs[3]-mins[3])+1)
+		} else if r.Dest != "R" {
+			sum += validCombinations(mins, maxs, n2w[r.Dest], n2w)
+		}
 	}
 	return sum
 }
