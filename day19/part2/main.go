@@ -40,11 +40,9 @@ func validCombinations(min, max []int, w Workflow, n2w map[string]Workflow) int6
 		newMin, newMax := min[ci], max[ci]
 		nextMin, nextMax := min[ci], max[ci]
 		if r.Op == "<" {
-			newMax = r.Num - 1
-			nextMin = r.Num
+			newMax, nextMin = r.Num-1, r.Num
 		} else if r.Op == ">" {
-			newMin = r.Num + 1
-			nextMax = r.Num
+			newMin, nextMax = r.Num+1, r.Num
 		}
 		mins := []int{min[0], min[1], min[2], min[3]}
 		maxs := []int{max[0], max[1], max[2], max[3]}
