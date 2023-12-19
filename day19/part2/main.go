@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"github.com/alecthomas/participle/v2"
 	"os"
-	"slices"
 )
 
 type Workflow struct {
@@ -23,22 +22,17 @@ type Input struct {
 
 var cat2idx = map[string]int{"x": 0, "m": 1, "a": 2, "s": 3}
 
-func workflowByName(ws []Workflow, name string) Workflow {
-	return ws[slices.IndexFunc(ws, func(w Workflow) bool {
-		return w.Name == name
-	})]
-}
 func combinations(min, max []int) int64 {
 	return int64((max[0]-min[0])+1) * int64((max[1]-min[1])+1) * int64((max[2]-min[2])+1) * int64((max[3]-min[3])+1)
 }
-func validCombinations(min, max []int, w Workflow, ws []Workflow) int64 {
+func validCombinations(min, max []int, w Workflow, n2w map[string]Workflow) int64 {
 	var sum int64
 	for _, r := range w.Rules {
 		if r.Op == "" {
 			if r.Cat == "A" {
 				sum += combinations(min, max)
 			} else if r.Cat != "R" {
-				sum += validCombinations(min, max, workflowByName(ws, r.Cat), ws)
+				sum += validCombinations(min, max, n2w[r.Cat], n2w)
 			}
 			return sum
 		}
@@ -58,7 +52,7 @@ func validCombinations(min, max []int, w Workflow, ws []Workflow) int64 {
 		if r.Dest == "A" {
 			sum += combinations(mins, maxs)
 		} else if r.Dest != "R" {
-			sum += validCombinations(mins, maxs, workflowByName(ws, r.Dest), ws)
+			sum += validCombinations(mins, maxs, n2w[r.Dest], n2w)
 		}
 		min[ci], max[ci] = nextMin, nextMax
 	}
@@ -70,8 +64,11 @@ func main() {
 	file, _ := os.Open(fileName)
 	parser, _ := participle.Build[Input]()
 	input, _ := parser.Parse(fileName, bufio.NewReader(file))
-	in := workflowByName(input.Workflows, "in")
+	n2w := make(map[string]Workflow)
+	for _, w := range input.Workflows {
+		n2w[w.Name] = w
+	}
 	mins := []int{1, 1, 1, 1}
 	maxs := []int{4000, 4000, 4000, 4000}
-	println(validCombinations(mins, maxs, in, input.Workflows))
+	println(validCombinations(mins, maxs, n2w["in"], n2w))
 }

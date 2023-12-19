@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"github.com/alecthomas/participle/v2"
 	"os"
-	"slices"
 )
 
 type Workflow struct {
@@ -18,11 +17,10 @@ type Rule struct {
 	Dest string `parser:"(':' @Ident)?"`
 }
 type Part struct {
-	X       int `parser:"'{' 'x' '=' @Int ','"`
-	M       int `parser:"'m' '=' @Int ','"`
-	A       int `parser:"'a' '=' @Int ','"`
-	S       int `parser:"'s' '=' @Int '}'"`
-	cat2val map[string]int
+	X int `parser:"'{' 'x' '=' @Int ','"`
+	M int `parser:"'m' '=' @Int ','"`
+	A int `parser:"'a' '=' @Int ','"`
+	S int `parser:"'s' '=' @Int '}'"`
 }
 type Input struct {
 	Workflows []Workflow `parser:"@@+"`
@@ -38,13 +36,13 @@ var compareFuncs = map[string]func(int, int) bool{
 	},
 }
 
-func isAccepted(p Part, w Workflow, ws []Workflow) bool {
+func isAccepted(c2v map[string]int, w Workflow, n2w map[string]Workflow) bool {
 	for {
 		for _, r := range w.Rules {
 			dest := r.Dest
 			if r.Op == "" {
 				dest = r.Cat
-			} else if !compareFuncs[r.Op](p.cat2val[r.Cat], r.Num) {
+			} else if !compareFuncs[r.Op](c2v[r.Cat], r.Num) {
 				continue
 			}
 			if dest == "A" {
@@ -52,9 +50,7 @@ func isAccepted(p Part, w Workflow, ws []Workflow) bool {
 			} else if dest == "R" {
 				return false
 			} else {
-				w = ws[slices.IndexFunc(ws, func(w Workflow) bool {
-					return w.Name == dest
-				})]
+				w = n2w[dest]
 				break
 			}
 		}
@@ -66,13 +62,14 @@ func main() {
 	file, _ := os.Open(fileName)
 	parser, _ := participle.Build[Input]()
 	input, _ := parser.Parse(fileName, bufio.NewReader(file))
-	in := input.Workflows[slices.IndexFunc(input.Workflows, func(w Workflow) bool {
-		return w.Name == "in"
-	})]
-	ratings := int64(0)
+	n2w := make(map[string]Workflow)
+	for _, w := range input.Workflows {
+		n2w[w.Name] = w
+	}
+	var ratings int64
 	for _, p := range input.Parts {
-		p.cat2val = map[string]int{"x": p.X, "m": p.M, "a": p.A, "s": p.S}
-		if isAccepted(p, in, input.Workflows) {
+		c2v := map[string]int{"x": p.X, "m": p.M, "a": p.A, "s": p.S}
+		if isAccepted(c2v, n2w["in"], n2w) {
 			ratings += int64(p.X + p.M + p.A + p.S)
 		}
 	}
