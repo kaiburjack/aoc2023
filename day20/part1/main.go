@@ -99,9 +99,23 @@ func main() {
 		}
 	}
 
+	renderAsDotFile(m)
+
 	var sent [2]int64
 	for i := 0; i < 1000; i++ {
 		bfs(broadcaster, &sent)
 	}
 	fmt.Printf("lo: %d, hi: %d, product: %d\n", sent[0], sent[1], sent[0]*sent[1])
+}
+
+func renderAsDotFile(m map[string]*module) {
+	dotFile, _ := os.Create("graph.dot")
+	_, _ = dotFile.WriteString("digraph {\n")
+	for _, mod := range m {
+		for _, output := range mod.outputs {
+			_, _ = dotFile.WriteString(fmt.Sprintf("\t%s -> %s\n", output.sender.name, output.receiver.name))
+		}
+	}
+	_, _ = dotFile.WriteString("}\n")
+	_ = dotFile.Close()
 }
