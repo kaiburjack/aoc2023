@@ -97,8 +97,7 @@ func main() {
 			ty = typeAndName[0]
 			name = typeAndName[1:]
 		}
-		mod, ok = m[name]
-		if !ok {
+		if mod, ok = m[name]; !ok {
 			mod = &module{name: name}
 			m[name] = mod
 		}
