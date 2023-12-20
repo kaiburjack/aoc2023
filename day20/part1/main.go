@@ -11,7 +11,7 @@ import (
 type wire struct {
 	sender   *module
 	receiver *module
-	state    int // <- for flip-flops to remember input state
+	state    int // <- for conjunctions to remember input state
 }
 type module struct {
 	name    string
