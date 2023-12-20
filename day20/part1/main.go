@@ -11,21 +11,21 @@ import (
 type wire struct {
 	sender   *module
 	receiver *module
-	state    int // <- for conjunctions to remember input state
+	state    uint8 // <- for conjunctions to remember input state
 }
 type module struct {
 	name    string
 	ty      uint8
 	outputs []*wire
 	inputs  []*wire
-	state   int // <- needed for flip-flops to remember own state
+	state   uint8 // <- needed for flip-flops to remember own state
 }
 type pulse struct {
 	w     *wire
-	state int
+	state uint8
 }
 
-func bfs(b *module, sent *[2]int64) {
+func bfs(b *module, sent *[2]uint64) {
 	var queue []pulse
 	sent[0]++ // <- initial button press sent to broadcaster
 	for _, output := range b.outputs {
@@ -56,10 +56,9 @@ func bfs(b *module, sent *[2]int64) {
 	}
 }
 
-func main() {
+func parseAndBuildGraph(m map[string]*module) *module {
 	file, _ := os.Open("input.txt")
 	r := bufio.NewScanner(file)
-	m := make(map[string]*module)
 	var broadcaster *module
 	for r.Scan() {
 		line := r.Text()
@@ -98,10 +97,14 @@ func main() {
 			omod.inputs = append(omod.inputs, w)
 		}
 	}
+	return broadcaster
+}
 
+func main() {
+	m := make(map[string]*module)
+	broadcaster := parseAndBuildGraph(m)
 	renderAsDotFile(m)
-
-	var sent [2]int64
+	var sent [2]uint64
 	for i := 0; i < 1000; i++ {
 		bfs(broadcaster, &sent)
 	}

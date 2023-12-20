@@ -10,18 +10,18 @@ import (
 type wire struct {
 	sender   *module
 	receiver *module
-	state    int // <- for conjunctions to remember input state
+	state    uint8 // <- for conjunctions to remember input state
 }
 type module struct {
 	name    string
 	ty      uint8
 	outputs []*wire
 	inputs  []*wire
-	state   int // <- needed for flip-flops to remember own state
+	state   uint8 // <- needed for flip-flops to remember own state
 }
 type pulse struct {
 	w     *wire
-	state int
+	state uint8
 }
 
 func bfs(b *module, btnPress uint64, receivers []*wire, found []uint64) {
@@ -76,10 +76,9 @@ func lcm(a, b uint64, rest ...uint64) uint64 {
 	}
 	return result
 }
-func main() {
+func parseAndBuildGraph(m map[string]*module) *module {
 	file, _ := os.Open("input.txt")
 	r := bufio.NewScanner(file)
-	m := make(map[string]*module)
 	var broadcaster *module
 	for r.Scan() {
 		line := r.Text()
@@ -118,6 +117,11 @@ func main() {
 			omod.inputs = append(omod.inputs, w)
 		}
 	}
+	return broadcaster
+}
+func main() {
+	m := make(map[string]*module)
+	broadcaster := parseAndBuildGraph(m)
 
 	// assume and verify multiple independent cycles behind a single inverter
 	rx := m["rx"]
@@ -127,6 +131,11 @@ func main() {
 	rxInput := rx.inputs[0].sender
 	if rxInput.ty != '&' {
 		panic("rxInput.ty != '&'")
+	}
+	for _, input := range rxInput.inputs {
+		if input.sender.ty != '&' {
+			panic("input.sender.ty != '&'")
+		}
 	}
 	btnPresses := make([]uint64, len(rxInput.inputs))
 	var btnPress uint64
