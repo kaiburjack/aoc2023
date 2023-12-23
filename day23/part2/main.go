@@ -46,10 +46,7 @@ func buildContractedEdges(grid [][]byte, sx, sy, px, py, ex, ey int, c *node, se
 			c.edges = append(c.edges, edge{endNode, d})
 			break
 		}
-		if len(nextPossibles) == 0 {
-			// if there are no possible next positions, we're at a dead end
-			break
-		} else if len(nextPossibles) == 1 {
+		if len(nextPossibles) == 1 {
 			// if there's only one possible next position, move there
 			// and continue the loop
 			sx, sy = nextPossibles[0][0], nextPossibles[0][1]
@@ -57,8 +54,7 @@ func buildContractedEdges(grid [][]byte, sx, sy, px, py, ex, ey int, c *node, se
 			// if there are multiple possible next positions, we're at a
 			// junction. add an edge to the junction node and recurse
 			// on each possible next position
-			seenNode, ok := seen[[2]int{sx, sy}]
-			if ok {
+			if seenNode, ok := seen[[2]int{sx, sy}]; ok {
 				c.edges = append(c.edges, edge{seenNode, d})
 				break
 			}
