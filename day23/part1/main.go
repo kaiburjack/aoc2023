@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"math"
 	"os"
 	"slices"
 )
@@ -17,17 +16,18 @@ type node struct {
 
 type edge struct {
 	to *node
-	d  int
+	d  uint
 }
 
 var dirs = [][]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
 var arrows = []byte{'v', '>', '^', '<'}
 
 func buildContractedEdges(grid [][]byte, sx, sy, px, py, ex, ey int, c *node, seen map[[2]int]*node) {
-	for d := 1; ; d++ {
+	for d := uint(1); ; d++ {
 		var nextPossibles [][]int
 		ai := slices.Index(arrows, grid[sy][sx])
 		for i := 0; i < 4; i++ {
+			// find possible next positions
 			nx, ny := sx+dirs[i][0], sy+dirs[i][1]
 			if nx < 0 || nx >= len(grid[0]) || ny < 0 || ny >= len(grid) ||
 				grid[ny][nx] == '#' ||
@@ -96,15 +96,23 @@ func writeGraphvizDotFile(seen map[[2]int]*node) {
 	_ = f.Close()
 }
 
-func longestPathDfs(n *node, seen []bool) uint64 {
+// custom max function for unsigned ints, because Go does not provide one...
+func umax(a, b uint) uint {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func longestPathDfs(n *node, seen []bool) uint {
 	if len(n.edges) == 0 {
 		return 0
 	}
-	var m uint64
+	var m uint
 	seen[n.id] = true
 	for _, e := range n.edges {
 		if !seen[e.to.id] {
-			m = uint64(math.Max(float64(m), float64(longestPathDfs(e.to, seen))+float64(e.d)))
+			m = umax(m, longestPathDfs(e.to, seen)+e.d)
 		}
 	}
 	seen[n.id] = false
