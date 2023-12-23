@@ -10,9 +10,9 @@ import (
 )
 
 type node struct {
-	id    uint8
-	edges []*edge
 	x, y  int
+	id    uint8
+	edges []edge
 }
 
 type edge struct {
@@ -24,12 +24,9 @@ var dirs = [][]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
 var arrows = []byte{'v', '>', '^', '<'}
 
 func buildContractedEdges(grid [][]byte, sx, sy, px, py, ex, ey int, c *node, seen map[[2]int]*node) {
-	d := 0
-	for {
-		d++
-		v := grid[sy][sx]
-		ai := slices.Index(arrows, v)
-		var possibleNext [][]int
+	for d := 1; ; d++ {
+		var nextPossibles [][]int
+		ai := slices.Index(arrows, grid[sy][sx])
 		for i := 0; i < 4; i++ {
 			nx, ny := sx+dirs[i][0], sy+dirs[i][1]
 			if nx < 0 || nx >= len(grid[0]) || ny < 0 || ny >= len(grid) ||
@@ -38,34 +35,41 @@ func buildContractedEdges(grid [][]byte, sx, sy, px, py, ex, ey int, c *node, se
 				px == nx && py == ny {
 				continue
 			}
-			possibleNext = append(possibleNext, []int{nx, ny})
+			nextPossibles = append(nextPossibles, []int{nx, ny})
 		}
 		px, py = sx, sy
 		if sx == ex && sy == ey {
+			// if we're at the end, add an edge to the end node
 			seenNode, ok := seen[[2]int{sx, sy}]
 			if ok {
-				c.edges = append(c.edges, &edge{seenNode, d})
+				c.edges = append(c.edges, edge{seenNode, d})
 				break
 			}
-			endNode := &node{uint8(len(seen)), nil, sx, sy}
+			endNode := &node{sx, sy, uint8(len(seen)), nil}
 			seen[[2]int{sx, sy}] = endNode
-			c.edges = append(c.edges, &edge{endNode, d})
+			c.edges = append(c.edges, edge{endNode, d})
 			break
 		}
-		if len(possibleNext) == 0 {
+		if len(nextPossibles) == 0 {
+			// if there are no possible next positions, we're at a dead end
 			break
-		} else if len(possibleNext) == 1 {
-			sx, sy = possibleNext[0][0], possibleNext[0][1]
+		} else if len(nextPossibles) == 1 {
+			// if there's only one possible next position, move there
+			// and continue the loop
+			sx, sy = nextPossibles[0][0], nextPossibles[0][1]
 		} else {
+			// if there are multiple possible next positions, we're at a
+			// junction. add an edge to the junction node and recurse
+			// on each possible next position
 			seenNode, ok := seen[[2]int{sx, sy}]
 			if ok {
-				c.edges = append(c.edges, &edge{seenNode, d})
+				c.edges = append(c.edges, edge{seenNode, d})
 				break
 			}
-			currentNode := &node{uint8(len(seen)), nil, sx, sy}
+			currentNode := &node{sx, sy, uint8(len(seen)), nil}
 			seen[[2]int{sx, sy}] = currentNode
-			c.edges = append(c.edges, &edge{currentNode, d})
-			for _, n := range possibleNext {
+			c.edges = append(c.edges, edge{currentNode, d})
+			for _, n := range nextPossibles {
 				buildContractedEdges(grid, n[0], n[1], px, py, ex, ey, currentNode, seen)
 			}
 			break
@@ -92,15 +96,15 @@ func writeGraphvizDotFile(seen map[[2]int]*node) {
 	_ = f.Close()
 }
 
-func longestPathDfs(n *node, seen []bool) float64 {
+func longestPathDfs(n *node, seen []bool) uint64 {
 	if len(n.edges) == 0 {
 		return 0
 	}
-	var m float64
+	var m uint64
 	seen[n.id] = true
 	for _, e := range n.edges {
 		if !seen[e.to.id] {
-			m = math.Max(m, longestPathDfs(e.to, seen)+float64(e.d))
+			m = uint64(math.Max(float64(m), float64(longestPathDfs(e.to, seen))+float64(e.d)))
 		}
 	}
 	seen[n.id] = false
@@ -120,7 +124,7 @@ func main() {
 		}
 	}
 	ex, ey := bytes.IndexByte(grid[len(grid)-1], '.'), len(grid)-1
-	start := &node{0, nil, sx, sy}
+	start := &node{sx, sy, 0, nil}
 	seen := map[[2]int]*node{[2]int{sx, sy}: start}
 	buildContractedEdges(grid, sx, sy+1, sx, sy, ex, ey, start, seen)
 	writeGraphvizDotFile(seen)

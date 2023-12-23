@@ -11,7 +11,7 @@ import (
 type node struct {
 	x, y  int
 	id    uint8
-	edges []*edge
+	edges []edge
 }
 
 type edge struct {
@@ -39,12 +39,12 @@ func buildContractedEdges(grid [][]byte, sx, sy, px, py, ex, ey int, c *node, se
 			// if we're at the end, add an edge to the end node
 			seenNode, ok := seen[[2]int{sx, sy}]
 			if ok {
-				c.edges = append(c.edges, &edge{seenNode, d})
+				c.edges = append(c.edges, edge{seenNode, d})
 				break
 			}
 			endNode := &node{sx, sy, uint8(len(seen)), nil}
 			seen[[2]int{sx, sy}] = endNode
-			c.edges = append(c.edges, &edge{endNode, d})
+			c.edges = append(c.edges, edge{endNode, d})
 			break
 		}
 		if len(nextPossibles) == 0 {
@@ -60,13 +60,13 @@ func buildContractedEdges(grid [][]byte, sx, sy, px, py, ex, ey int, c *node, se
 			// on each possible next position
 			seenNode, ok := seen[[2]int{sx, sy}]
 			if ok {
-				c.edges = append(c.edges, &edge{seenNode, d})
+				c.edges = append(c.edges, edge{seenNode, d})
 				break
 			}
 			currentNode := &node{sx, sy, uint8(len(seen)), nil}
 			seen[[2]int{sx, sy}] = currentNode
-			c.edges = append(c.edges, &edge{currentNode, d})
-			currentNode.edges = append(currentNode.edges, &edge{c, d})
+			c.edges = append(c.edges, edge{currentNode, d})
+			currentNode.edges = append(currentNode.edges, edge{c, d})
 			for _, n := range nextPossibles {
 				buildContractedEdges(grid, n[0], n[1], px, py, ex, ey, currentNode, seen)
 			}
