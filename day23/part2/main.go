@@ -72,7 +72,8 @@ func buildContractedEdges(grid [][]byte, sx, sy, px, py, ex, ey int, c *node, se
 
 func writeGraphvizDotFile(seen map[[2]int]*node) {
 	f, _ := os.Create("graph.dot")
-	_, _ = f.WriteString("digraph {\n")
+	_, _ = f.WriteString("graph {\n")
+	linked := make(map[[2]uint8]bool)
 	for _, n := range seen {
 		color := "white"
 		if n.id == 0 {
@@ -82,7 +83,11 @@ func writeGraphvizDotFile(seen map[[2]int]*node) {
 		}
 		_, _ = f.WriteString(fmt.Sprintf("\t%d [label=\"%d,%d\" fillcolor=\"%s\" style=\"filled\"];\n", n.id, n.x, n.y, color))
 		for _, e := range n.edges {
-			_, _ = f.WriteString(fmt.Sprintf("\t%d -> %d [label=\"%d\"];\n", n.id, e.to.id, e.d))
+			if linked[[2]uint8{n.id, e.to.id}] || linked[[2]uint8{e.to.id, n.id}] {
+				continue
+			}
+			linked[[2]uint8{n.id, e.to.id}] = true
+			_, _ = f.WriteString(fmt.Sprintf("\t%d -- %d [label=\"%d\"];\n", n.id, e.to.id, e.d))
 		}
 	}
 	_, _ = f.WriteString("}\n")
