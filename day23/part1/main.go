@@ -96,14 +96,6 @@ func writeGraphvizDotFile(seen map[[2]int]*node) {
 	_ = f.Close()
 }
 
-// custom max function for unsigned ints, because Go does not provide one...
-func umax(a, b uint) uint {
-	if a > b {
-		return a
-	}
-	return b
-}
-
 func longestPathDfs(n *node, seen []bool) uint {
 	if len(n.edges) == 0 {
 		return 0
@@ -112,7 +104,7 @@ func longestPathDfs(n *node, seen []bool) uint {
 	seen[n.id] = true
 	for _, e := range n.edges {
 		if !seen[e.to.id] {
-			m = umax(m, longestPathDfs(e.to, seen)+e.d)
+			m = max(m, longestPathDfs(e.to, seen)+e.d)
 		}
 	}
 	seen[n.id] = false
